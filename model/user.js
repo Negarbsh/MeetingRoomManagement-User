@@ -50,10 +50,14 @@ class User {
         return /[0-9]+/.test(given_password) && /[A-Za-z]+/.test(given_password)
     }
 
+    static get_employee_list(){
+        //todo send an array of all the employees with full name, team and office
+    }
+
     constructor(email, password, phone_number, full_name, department, organization, office, working_hours, is_admin) {
         this.id = User.last_id++
         this.email = email.toLowerCase()
-        this.hashed_password = hash_password(password)    //todo we should encrypt the password and then save it
+        this.hashed_password = hash_password(password)
         this.phone_number = phone_number
         this.full_name = full_name
         this.departmant = department
@@ -74,10 +78,9 @@ class User {
         try {
             return await bcrypt.compare(entered_password, this.hashed_password)
         } catch (error) {
-            console.log(error) //todo what should we do here?
-        }// return hash_password(entered_password) === this.hashed_password
+            console.log(error)
+        }
     }
-
 
 }
 

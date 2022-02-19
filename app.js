@@ -11,21 +11,21 @@ app.post('/create_employee', async (req, res) => {
     const data = req.body
     //the request should be a json that has all user's fields (except is_admin)
 
-    await request_handler.sign_up_employee(data, res).then(r => {
-    })
+    request_handler.sign_up_employee(data, res)
+    // const response_obj = request_handler.sign_up_employee(data, res)
+    // res.status(response_obj.status).send(response_obj.get_json)
 });
 
 app.post('/sign_up_admin', async (req, res) => {
     const data = req.body
     //the request should be a json that has all user's fields (except is_admin)
-    await request_handler.sign_up_admin(data, res)
+    request_handler.sign_up_admin(data, res)
 });
 
 
 app.post('/login', (req, res) => {
     const data = req.body
-    request_handler.login(data, res).then(r => {
-    })
+    request_handler.login(data, res)
 })
 
 app.post('/logout', async (req, res) => {
@@ -34,12 +34,10 @@ app.post('/logout', async (req, res) => {
 })
 
 
-app.post('/admin_panel', (req, res) => {
-    if (User.online_users.includes(User.admin.id)) {
-        //todo : show the admin panel!
-    } else {
-        res.redirect('/login');
-    }
+app.post('/admin_panel/show_employee_list', (req, res) => {
+    request_handler.show_employee_list(data, res)
+    //     res.redirect('/login');
+
 });
 
 module.exports = app

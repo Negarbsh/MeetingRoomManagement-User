@@ -12,15 +12,18 @@ function has_access(user, action) {
             return user === User.admin
         case Action.logout:
             return true
+        case Action.show_employee_list:
+            return user === User.admin
+
         default:
             return true //todo complete
     }
 }
 
 
-async function create_access_token(email, id) {
+function create_access_token(email, id) {
     process.env.TOKEN_KEY = "it should've been secret!" //todo it shouldn't be hard-coded like this
-    return await jwt.sign(
+    return  jwt.sign(
         {user_id: id, email: email},
         process.env.TOKEN_KEY,
         {
@@ -30,9 +33,13 @@ async function create_access_token(email, id) {
 }
 
 //we should parse the token in the data and find out who has sent this request
-async function authenticate_actor(token) {
-    const decoded_token = await jwt_decode(token)
-    return User.get_user_by_email(decoded_token.email)
+function authenticate_actor(token) {
+    try {
+        const decoded_token = jwt_decode(token)
+        return User.get_user_by_email(decoded_token.email)
+    }catch (e){
+        return null
+    }
 }
 
 module.exports = {has_access, create_access_token, authenticate_actor}
