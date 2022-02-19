@@ -7,28 +7,30 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.post('/create_employee', (req, res) => {
+app.post('/create_employee', async (req, res) => {
     const data = req.body
     //the request should be a json that has all user's fields (except is_admin)
 
-    request_handler.sign_up_employee(data, res)
+    await request_handler.sign_up_employee(data, res).then(r => {
+    })
 });
 
-app.post('/sign_up_admin', (req, res) => {
+app.post('/sign_up_admin', async (req, res) => {
     const data = req.body
     //the request should be a json that has all user's fields (except is_admin)
-    request_handler.sign_up_admin(data, res)
+    await request_handler.sign_up_admin(data, res)
 });
 
 
 app.post('/login', (req, res) => {
     const data = req.body
-    request_handler.login(data, res).then(r => {})
+    request_handler.login(data, res).then(r => {
+    })
 })
 
-app.post('/logout', (req, res) => {
+app.post('/logout', async (req, res) => {
     const data = req.body
-    request_handler.logout(data, res)
+    await request_handler.logout(data, res)
 })
 
 

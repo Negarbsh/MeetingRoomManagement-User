@@ -23,9 +23,10 @@ class User {
         return null
     }
 
-    static new_login_user(user){
+    static login_user(user, token){
         User.online_users.push(user.id)
         user.is_logged_in = true
+        user.token = token
     }
 
     static logout_user(user){

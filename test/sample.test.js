@@ -1,6 +1,6 @@
 // tests should be run together
 
-const app = require("./app")
+const app = require("../app")
 const supertest = require("supertest");
 
 const right_admin_data = {
@@ -49,16 +49,14 @@ let admin_token
 let emp1_token
 
 
-test("sample", () => {
-    expect(2).toBe(2)
-})
-
 test("sign up admin with weak password, unsuccessful", async () => {
     let req = JSON.parse(JSON.stringify(right_admin_data))
     req.password = weak_password
+
     const response = await supertest(app).post('/sign_up_admin').send(req);
-    expect(response.status).toBe(406)
     const data = response.body
+
+    expect(response.status).toBe(406)
     expect(data.message).toBe("Sign up is invalid")
 });
 
