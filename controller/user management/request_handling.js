@@ -1,6 +1,7 @@
 const User = require("../../model/user");
 const access_manager = require("./access_manager")
 const Action = require("./actions")
+const Response = require("../../model/response")
 
 const success_status = 200
 const access_denied_status = 403
@@ -86,21 +87,19 @@ function logout(data) {
     return response_obj
 }
 
-function show_employee_list(data, res) {
+function show_employee_list(data) {
+    //todo : if admin hadn't logged in, we should redirect to admin panel
+    const response_obj = Response.get_empty_response()
     const actor = access_manager.authenticate_actor(data.token)
     if (access_manager.has_access(actor, Action.show_employee_list)) {
-        // see a list of employees with the following details
-        //
-        // First Name and Last Name
-        // Team
-        // Office
-        const employee_list = User.get_employee_list().stringify()
-        res.status(success_status).send({status: 'success', message: employee_list})
 
+        const employee_list = User.get_employee_list()
+        response_obj.edit(success_status, true, employee_list)
 
     } else {
-        res.status(access_denied_status).send({status: 'failure', message: 'Invalid access.'})
+        response_obj.edit(access_denied_status, false, 'Invalid access.')
     }
+    return response_obj
 }
 
 module.exports = {sign_up_admin, sign_up_employee, login, logout, show_employee_list}

@@ -48,3 +48,5 @@ class Response {
         this.json = this.generate_json()
     }
 }
+
+module.exports = Response

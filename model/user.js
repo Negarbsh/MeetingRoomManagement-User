@@ -1,5 +1,4 @@
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
 function hash_password(password) {
     return bcrypt.hashSync(password, 10);
@@ -23,15 +22,15 @@ class User {
         return null
     }
 
-    static login_user(user, token){
+    static login_user(user, token) {
         User.online_users.push(user.id)
         user.is_logged_in = true
         user.token = token
     }
 
-    static logout_user(user){
+    static logout_user(user) {
         const index = User.online_users.indexOf(user.id)
-        if(index === -1) return -1
+        if (index === -1) return -1
         User.online_users.splice(index)
         user.is_logged_in = false
         return 0
@@ -46,12 +45,16 @@ class User {
 
     static is_password_strong(given_password) {
         if (given_password.length < 10) return false
-        // return given_password.match(/(0-9)+/) && given_password.match(/(A-Za-z)+/)
         return /[0-9]+/.test(given_password) && /[A-Za-z]+/.test(given_password)
     }
 
-    static get_employee_list(){
-        //todo send an array of all the employees with full name, team and office
+    static get_employee_list() {
+        const employee_list = []
+        for (const user of User.all_users) {
+            if (!user.is_admin)
+                employee_list.push({'full name': user.full_name, 'team': user.team, 'office': user.office})
+        }
+        return employee_list
     }
 
     constructor(email, password, phone_number, full_name, department, organization, office, working_hours, is_admin) {
@@ -67,6 +70,7 @@ class User {
 
         this.is_logged_in = false
         if (is_admin) User.set_admin(this)
+        this.is_admin = is_admin
         User.all_users.push(this)
     }
 
