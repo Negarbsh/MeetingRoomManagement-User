@@ -17,7 +17,7 @@ function sign_up_admin(signup_data) {
     } else {
         if (User.can_create_user(signup_data.email, signup_data.password)) {
             new User(signup_data.email, signup_data.password, signup_data.phone_number, signup_data.full_name,
-                signup_data.department, signup_data.organization, signup_data.office, signup_data.working_hours, true)
+                signup_data.department, signup_data.team, signup_data.organization, signup_data.office, signup_data.working_hours, 'admin', true, true)
             response_obj.edit(success_status, true, 'Admin user is created successfully!')
         } else {
             response_obj.edit(invalid_request_status, false, 'Sign up is invalid!')
@@ -34,7 +34,7 @@ function sign_up_employee(signup_data) {
     if (access_manager.has_access(actor, Action.create_employee)) {
         if (User.can_create_user(signup_data.email, signup_data.password)) {
             new User(signup_data.email, signup_data.password, signup_data.phone_number, signup_data.full_name,
-                signup_data.department, signup_data.organization, signup_data.office, signup_data.working_hours, false)
+                signup_data.department, signup_data.team, signup_data.organization, signup_data.office, signup_data.working_hours, signup_data.role, signup_data.is_active, false)
             response_obj.edit(success_status, true, 'Employee is created successfully!')
         } else {
             response_obj.edit(invalid_request_status, false, 'Sign up is invalid. Either password is weak or the email is repeated')
@@ -88,17 +88,20 @@ function logout(data) {
 }
 
 function show_employee_list(data) {
-    //todo : if admin hadn't logged in, we should redirect to admin panel
     const response_obj = Response.get_empty_response()
+
+    if (!data.token) { //means that the user wasn't logged in, we should redirect to login page
+        response_obj.set_redirecting(true, '/login')
+        return response_obj
+    }
+
     const actor = access_manager.authenticate_actor(data.token)
     if (access_manager.has_access(actor, Action.show_employee_list)) {
 
         const employee_list = User.get_employee_list()
         response_obj.edit(success_status, true, employee_list)
 
-    } else {
-        response_obj.edit(access_denied_status, false, 'Invalid access.')
-    }
+    } else response_obj.edit(access_denied_status, false, 'Invalid access.')
     return response_obj
 }
 

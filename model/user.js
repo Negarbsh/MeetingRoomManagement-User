@@ -52,21 +52,29 @@ class User {
         const employee_list = []
         for (const user of User.all_users) {
             if (!user.is_admin)
-                employee_list.push({'full name': user.full_name, 'team': user.team, 'office': user.office})
+                employee_list.push({
+                    'full name': user.full_name,
+                    'department': user.department,
+                    'team': user.team,
+                    'office': user.office
+                })
         }
         return employee_list
     }
 
-    constructor(email, password, phone_number, full_name, department, organization, office, working_hours, is_admin) {
+    constructor(email, password, phone_number, full_name, department, team, organization, office, working_hours, role, is_active, is_admin) {
         this.id = User.last_id++
         this.email = email.toLowerCase()
         this.hashed_password = hash_password(password)
         this.phone_number = phone_number
         this.full_name = full_name
         this.departmant = department
-        this.organization = organization
+        this.team = team
+        this.organization_level = organization
         this.office = office
         this.working_hours = working_hours
+        this.role = role
+        this.is_active = is_active
 
         this.is_logged_in = false
         if (is_admin) User.set_admin(this)
@@ -84,6 +92,15 @@ class User {
         } catch (error) {
             console.log(error)
         }
+    }
+
+    edit(full_name, department, organization_level, office, working_hours, role, is_active) {
+        if (full_name) this.full_name = full_name
+        if (organization_level) this.organization_level = organization_level
+        if (office) this.office = office
+        if (working_hours) this.working_hours = working_hours
+        if (role) this.role = role
+        if (is_active) this.is_active = is_active
     }
 
 }

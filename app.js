@@ -38,11 +38,17 @@ app.post('/logout', async (req, res) => {
 app.post('/admin_panel/show_employee_list', (req, res) => {
 
     const response_obj = request_handler.show_employee_list(req.body)
-    res.status(response_obj.status_code).send(response_obj.get_json())
+    if (response_obj.should_redirect) {
+        res.send({message: "please login first"})
+        res.redirect(307, response_obj.redirecting_link); //todo How can I make sure it is working?
+    } else res.status(response_obj.status_code).send(response_obj.get_json())
 
-    //     res.redirect('/login');
 
 });
+
+app.post('/admin_panel/show_employee_list/view_employee', (req, res) => {
+
+})
 
 module.exports = app
 

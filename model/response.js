@@ -15,8 +15,8 @@ class Response {
 
     constructor(status_code, is_successful, message, token) {
 
-        if (!status_code) status_code = 200
-        this.status_code = status_code
+        if (!status_code)
+            this.status_code = status_code
         this.message = message
         this.token = token
         this.is_successful = is_successful
@@ -40,13 +40,19 @@ class Response {
         return this.json
     }
 
-    edit(status_code, is_successful , message, token){
+    edit(status_code, is_successful, message, token) {
         this.status_code = status_code || this.status_code
         this.message = message || this.message
         this.token = token || this.token
         this.is_successful = is_successful || this.is_successful
         this.json = this.generate_json()
     }
+
+    set_redirecting(should_redirect, redirect_link) {
+        this.should_redirect = should_redirect
+        this.redirecting_link = redirect_link
+    }
+
 }
 
 module.exports = Response
