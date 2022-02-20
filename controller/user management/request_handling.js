@@ -1,9 +1,6 @@
 const User = require("../../model/user");
 const access_manager = require("./access_manager")
 const Action = require("./actions")
-const jwt = require("jsonwebtoken");
-const {json} = require("express");
-const jwt_decode = require('jwt-decode')
 
 const success_status = 200
 const access_denied_status = 403
@@ -11,82 +8,82 @@ const invalid_request_status = 406
 const bad_request_status = 400
 
 
-function sign_up_admin(signup_data, res) {
-    let json_msg, status_code = 406
+function sign_up_admin(signup_data) {
+    const response_obj = Response.get_empty_response()
 
     if (!User.can_have_admin()) {
-        json_msg = {status: 'failure', message: 'An admin already exists!'}
+        response_obj.edit(invalid_request_status, false, 'An admin already exists!')
     } else {
         if (User.can_create_user(signup_data.email, signup_data.password)) {
             new User(signup_data.email, signup_data.password, signup_data.phone_number, signup_data.full_name,
                 signup_data.department, signup_data.organization, signup_data.office, signup_data.working_hours, true)
-            json_msg = {status: 'success', message: 'Admin user is created successfully!'}
-            status_code = success_status
+            response_obj.edit(success_status, true, 'Admin user is created successfully!')
         } else {
-            json_msg = {status: 'failure', message: 'Sign up is invalid'}
+            response_obj.edit(invalid_request_status, false, 'Sign up is invalid!')
         }
     }
-    res.status(status_code).send(json_msg)
+    return response_obj
 }
 
-function sign_up_employee(signup_data, res) {
+function sign_up_employee(signup_data) {
     const actor = access_manager.authenticate_actor(signup_data.token)
-    let json_msg, status_code
-    // const response = new Response()
+
+    const response_obj = Response.get_empty_response()
+
     if (access_manager.has_access(actor, Action.create_employee)) {
         if (User.can_create_user(signup_data.email, signup_data.password)) {
             new User(signup_data.email, signup_data.password, signup_data.phone_number, signup_data.full_name,
                 signup_data.department, signup_data.organization, signup_data.office, signup_data.working_hours, false)
-            json_msg = {status: 'success', message: 'Employee is created successfully!'}
-            status_code = success_status
+            response_obj.edit(success_status, true, 'Employee is created successfully!')
         } else {
-            json_msg = {
-                status: 'failure',
-                message: 'Sign up is invalid. Either password is weak or the email is repeated'
-            }
-            status_code = invalid_request_status
+            response_obj.edit(invalid_request_status, false, 'Sign up is invalid. Either password is weak or the email is repeated')
         }
     } else {
-        json_msg = {status: 'failure', message: 'access denied'}
-        status_code = access_denied_status
+        response_obj.edit(access_denied_status, false, 'access denied')
     }
-
-    res.status(status_code).send(json_msg)
+    return response_obj
 }
 
-function login(data, res) {
+function login(data) {
+    const response_obj = Response.get_empty_response()
+
     let given_email = data.email
     const given_pass = data.password
     if (!(given_email && given_pass)) {
-        res.status(bad_request_status).send({status: "failure", message: "Email and password are required!"})
+        response_obj.edit(bad_request_status, false, 'Email and password are required!')
     } else {
         given_email = given_email.toLowerCase()
         const user = User.get_user_by_email(given_email)
+
         if (!user || !(user.is_password_correct(given_pass))) {
-            res.status(invalid_request_status).send({status: "failure", message: "Email or password is not correct!"})
+            response_obj.edit(invalid_request_status, false, 'Email or password is not correct!')
         } else if (user.is_logged_in) {
-            res.status(invalid_request_status).send({status: "failure", message: "User is already logged in!"})
+            response_obj.edit(invalid_request_status, false, 'User is already logged in!')
         } else {
             const token = access_manager.create_access_token(given_email, user.id)
             User.login_user(user, token)
-            res.status(success_status).send({status: "success", message: "login successful!", token: token})
+
+            response_obj.edit(success_status, true, 'login successful!', token)
         }
     }
+    return response_obj
 }
 
-function logout(data, res) {
+function logout(data) {
     const actor = access_manager.authenticate_actor(data.token)
+    const response_obj = Response.get_empty_response()
+
     if (access_manager.has_access(actor, Action.logout)) {
         const logout_status = User.logout_user(actor)
         if (logout_status === 0)
-            res.status(success_status).send({status: 'success', message: 'User logged out successfully!'})
+            response_obj.edit(success_status, true, 'User logged out successfully!')
         else {
-            res.status(invalid_request_status).send({status: 'failure', message: 'User logged is not logged in!'})
+            response_obj.edit(invalid_request_status, false, 'User logged is not logged in!')
         }
     } else {
-        res.status(access_denied_status).send({status: 'failure', message: 'Invalid access.'})
+        response_obj.edit(access_denied_status, false, 'Invalid access.')
     }
-
+    return response_obj
 }
 
 function show_employee_list(data, res) {

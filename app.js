@@ -1,5 +1,4 @@
 const express = require('express');
-const User = require("./model/user");
 const request_handler = require("./controller/user management/request_handling")
 
 const app = express();
@@ -7,30 +6,32 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.post('/create_employee', async (req, res) => {
-    const data = req.body
-    //the request should be a json that has all user's fields (except is_admin)
 
-    request_handler.sign_up_employee(data, res)
-    // const response_obj = request_handler.sign_up_employee(data, res)
-    // res.status(response_obj.status).send(response_obj.get_json)
-});
-
+//the request should be a json that has all user's fields (except is_admin)
 app.post('/sign_up_admin', async (req, res) => {
     const data = req.body
-    //the request should be a json that has all user's fields (except is_admin)
-    request_handler.sign_up_admin(data, res)
+    const response_obj = request_handler.sign_up_admin(data)
+    res.status(response_obj.status_code).send(response_obj.get_json())
+});
+
+//the request should be a json that has all user's fields (except is_admin)
+app.post('/create_employee', async (req, res) => {
+    const data = req.body
+    const response_obj = request_handler.sign_up_employee(data)
+    res.status(response_obj.status_code).send(response_obj.get_json)
 });
 
 
 app.post('/login', (req, res) => {
     const data = req.body
-    request_handler.login(data, res)
+    const response_obj = request_handler.login(data)
+    res.status(response_obj.status_code).send(response_obj.get_json())
 })
 
 app.post('/logout', async (req, res) => {
     const data = req.body
-    await request_handler.logout(data, res)
+    const response_obj = request_handler.logout(data)
+    res.status(response_obj.status_code).send(response_obj.get_json())
 })
 
 
