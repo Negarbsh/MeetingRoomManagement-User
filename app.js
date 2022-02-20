@@ -43,11 +43,16 @@ app.post('/admin_panel/show_employee_list', (req, res) => {
         res.redirect(307, response_obj.redirecting_link); //todo How can I make sure it is working?
     } else res.status(response_obj.status_code).send(response_obj.get_json())
 
-
 });
 
 app.post('/admin_panel/show_employee_list/view_employee', (req, res) => {
+    const response_obj = request_handler.view_employee(req.body)
+    res.status(response_obj.status_code).send(response_obj.get_json())
+})
 
+app.post('/admin_panel/show_employee_list/edit_employee', (req, res) => {
+    const response_obj = request_handler.edit_employee(req.body)
+    res.status(response_obj.status_code).send(response_obj.get_json())
 })
 
 module.exports = app

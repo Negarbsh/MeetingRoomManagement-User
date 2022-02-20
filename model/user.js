@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 
 function hash_password(password) {
-    return bcrypt.hashSync(password, 10);
+    return bcrypt.hashSync(password, 10); //todo hash salt
 }
 
 class User {
@@ -18,6 +18,13 @@ class User {
     static get_user_by_email(email) {
         for (const user of User.all_users) {
             if (user.email === email.toLowerCase()) return user
+        }
+        return null
+    }
+
+    static get_user_by_id(id) {
+        for (const user of User.all_users) {
+            if (user.id === id) return user
         }
         return null
     }
@@ -49,27 +56,40 @@ class User {
     }
 
     static get_employee_list() {
-        const employee_list = []
-        for (const user of User.all_users) {
-            if (!user.is_admin)
-                employee_list.push({
-                    'full name': user.full_name,
-                    'department': user.department,
-                    'team': user.team,
-                    'office': user.office
-                })
-        }
-        return employee_list
+        return User.employee_list
     }
 
-    constructor(email, password, phone_number, full_name, department, team, organization, office, working_hours, role, is_active, is_admin) {
+    static get_attributes(user_id) {
+        const user = User.get_user_by_id(user_id)
+        return {
+            'email': user.email,
+            'phone number': user.phone_number,
+            'full name': user.full_name,
+            'department': user.department,
+            'organization level': user.organization_level,
+            'office': user.office,
+            'working hours': user.working_hours,
+            'role': user.role,
+            'active/not active status': user.get_active_status()
+        }
+    }
+
+    static edit_attributes(user_id, attributes) {
+        const user = User.get_user_by_id(user_id)
+        if (user) {
+            user.edit(attributes.full_name, attributes.department, attributes.organization_level, attributes.office, attributes.working_hours, attributes.role, attributes.is_active)
+            return true
+        }
+        return false
+    }
+
+    constructor(email, password, phone_number, full_name, department, organization, office, working_hours, role, is_active, is_admin) {
         this.id = User.last_id++
         this.email = email.toLowerCase()
         this.hashed_password = hash_password(password)
         this.phone_number = phone_number
         this.full_name = full_name
-        this.departmant = department
-        this.team = team
+        this.department = department
         this.organization_level = organization
         this.office = office
         this.working_hours = working_hours
@@ -79,8 +99,23 @@ class User {
         this.is_logged_in = false
         if (is_admin) User.set_admin(this)
         this.is_admin = is_admin
+
         User.all_users.push(this)
+        if (!is_admin) User.employee_list.push({
+            "id": this.id,
+            "full name": this.full_name,
+            "department": this.department,
+            "office": this.office
+        })
     }
+
+
+    get_active_status() {
+        if (this.is_active)
+            return 'active'
+        return 'not active'
+    }
+
 
     change_password(new_password) {
         this.hashed_password = hash_password(new_password)
@@ -110,6 +145,7 @@ function initiateUser() {
     User.online_users = []
     User.last_id = 0
     User.admin = null
+    User.employee_list = []
 }
 
 initiateUser()

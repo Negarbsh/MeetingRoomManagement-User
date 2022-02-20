@@ -57,7 +57,7 @@ test("sign up admin with weak password, unsuccessful", async () => {
     const data = response.body
 
     expect(response.status).toBe(406)
-    expect(data.message).toBe("Sign up is invalid")
+    expect(data.message).toBe("Sign up is invalid!")
 });
 
 
@@ -105,7 +105,7 @@ test("login admin second time, unsuccessful", async () => {
     })
     expect(response.status).toBe(406)
     const data = response.body
-    admin_token = data.token + "admin" //todo we should remove this! right now we're adding 'admin' because all the tokens are the same
+    admin_token = data.token
     expect(data.message).toBe('User is already logged in!')
 })
 

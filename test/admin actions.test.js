@@ -7,14 +7,13 @@ let admin, admin_data, emp_data;
 
 beforeAll(() => {
     admin = new User('admin@email.com', 'a strong password1', 1234,
-        'admin user', 'a department','a team', 'an organization', 'the office', 9, true)
+        'admin user', 'a department', 'an organization', 'the office', 9, true)
     admin_data = {
         "email": "admin@email.com",
         "password": "a strong password1",
         "phone_number": 1234,
         "full_name": "admin user",
         "department": "a department",
-        "team": "a team",
         "organization": "an organization",
         "office": "the office",
         "working_hours": 9
@@ -25,7 +24,6 @@ beforeAll(() => {
         "phone_number": 12345,
         "full_name": "just like this",
         "department": "a dep name",
-        "team": "another team",
         "organization": "somewhere",
         "office": "somewhere else",
         "working_hours": 9,

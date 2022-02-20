@@ -17,7 +17,7 @@ function sign_up_admin(signup_data) {
     } else {
         if (User.can_create_user(signup_data.email, signup_data.password)) {
             new User(signup_data.email, signup_data.password, signup_data.phone_number, signup_data.full_name,
-                signup_data.department, signup_data.team, signup_data.organization, signup_data.office, signup_data.working_hours, 'admin', true, true)
+                signup_data.department, signup_data.organization, signup_data.office, signup_data.working_hours, 'admin', true, true)
             response_obj.edit(success_status, true, 'Admin user is created successfully!')
         } else {
             response_obj.edit(invalid_request_status, false, 'Sign up is invalid!')
@@ -34,7 +34,7 @@ function sign_up_employee(signup_data) {
     if (access_manager.has_access(actor, Action.create_employee)) {
         if (User.can_create_user(signup_data.email, signup_data.password)) {
             new User(signup_data.email, signup_data.password, signup_data.phone_number, signup_data.full_name,
-                signup_data.department, signup_data.team, signup_data.organization, signup_data.office, signup_data.working_hours, signup_data.role, signup_data.is_active, false)
+                signup_data.department, signup_data.organization, signup_data.office, signup_data.working_hours, signup_data.role, signup_data.is_active, false)
             response_obj.edit(success_status, true, 'Employee is created successfully!')
         } else {
             response_obj.edit(invalid_request_status, false, 'Sign up is invalid. Either password is weak or the email is repeated')
@@ -87,17 +87,19 @@ function logout(data) {
     return response_obj
 }
 
+function ask_to_login(response_obj) {
+    response_obj.set_redirecting(true, '/login')
+    return response_obj
+}
+
 function show_employee_list(data) {
     const response_obj = Response.get_empty_response()
 
-    if (!data.token) { //means that the user wasn't logged in, we should redirect to login page
-        response_obj.set_redirecting(true, '/login')
-        return response_obj
-    }
-
     const actor = access_manager.authenticate_actor(data.token)
-    if (access_manager.has_access(actor, Action.show_employee_list)) {
+    if (!actor || !actor.is_logged_in)
+        return ask_to_login(response_obj);
 
+    if (access_manager.has_access(actor, Action.show_employee_list)) {
         const employee_list = User.get_employee_list()
         response_obj.edit(success_status, true, employee_list)
 
@@ -105,4 +107,38 @@ function show_employee_list(data) {
     return response_obj
 }
 
-module.exports = {sign_up_admin, sign_up_employee, login, logout, show_employee_list}
+function view_employee(data) {
+    const response_obj = Response.get_empty_response()
+
+    const actor = access_manager.authenticate_actor(data.token)
+    // if (!actor || !actor.is_logged_in)
+    //     return ask_to_login(response_obj);
+    if (access_manager.has_access(actor, Action.view_employee)) {
+        if ('employee_id' in data) {
+            const user_info = User.get_attributes(data.employee_id)
+            if (!user_info) response_obj.edit(bad_request_status, false, 'User id is wrong!')
+            else response_obj.edit(success_status, true, user_info)
+        } else response_obj.edit(bad_request_status, false, 'No employee id specified!')
+    } else response_obj.edit(access_denied_status, false, 'Invalid access.')
+    return response_obj
+}
+
+function edit_employee(data) {
+    const response_obj = Response.get_empty_response()
+    const actor = access_manager.authenticate_actor(data.token)
+
+    if (access_manager.has_access(actor, Action.edit_employee)) {
+        if (!'employee_id' in data)
+            response_obj.edit(bad_request_status, false, 'No employee id specified!')
+        else if (!'attributes' in data)
+            response_obj.edit(bad_request_status, false, 'No attributes field specified!')
+        else {
+            const success = User.edit_attributes(data.employee_id, data.attributes)
+            if (success) response_obj.edit(success_status, true, 'Editable attributes were edited successfully!')
+            else response_obj.edit(invalid_request_status, false, 'User id is wrong!')
+        }
+    } else response_obj.edit(access_denied_status, false, 'Invalid access.')
+    return response_obj
+}
+
+module.exports = {sign_up_admin, sign_up_employee, login, logout, show_employee_list, view_employee, edit_employee}
