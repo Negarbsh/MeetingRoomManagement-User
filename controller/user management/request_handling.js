@@ -208,6 +208,21 @@ function search_employees(data) {
     return response_obj
 }
 
+function get_working_hour(data) {
+    const actor = access_manager.authenticate_actor(data.token)
+    const response_obj = Response.get_empty_response()
+    if (access_manager.has_access(actor, Action.get_working_hour)) {
+        if (!'employee_id' in data)
+            response_obj.edit(bad_request_status, false, 'No "employee_id" specified!')
+        else {
+            const answer = User.get_working_hour(data.employee_id)
+            if (answer === null) response_obj.edit(bad_request_status, false, 'No user with this id exists!')
+            else response_obj.edit(success_status, true, {'working_hours': answer})
+        }
+    } else response_obj.edit(access_denied_status, false, 'Invalid access.')
+    return response_obj
+}
+
 module.exports = {
     sign_up_admin,
     sign_up_employee,
@@ -219,5 +234,6 @@ module.exports = {
     disable_employee,
     enable_employee,
     edit_oneself,
-    search_employees
+    search_employees,
+    get_working_hour
 }

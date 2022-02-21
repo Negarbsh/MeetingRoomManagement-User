@@ -77,6 +77,10 @@ app.post('/search', (req, res) => {
     res.status(response_obj.status_code).send(response_obj.get_json())
 })
 
+app.post('/get_working_hour', (req, res) => {
+    const response_obj = request_handler.get_working_hour(req.body)
+    res.status(response_obj.status_code).send(response_obj.get_json())
+})
 
 module.exports = app
 

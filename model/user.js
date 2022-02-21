@@ -138,6 +138,12 @@ class User {
         return this.filter_by_office(office_name, this.filter_by_department(department_name))
     }
 
+    static get_working_hour(user_id) {
+        const user = this.get_user_by_id(user_id)
+        if (!user) return null
+        return user.working_hours
+    }
+
     constructor(email, password, phone_number, full_name, department, organization, office, working_hours, role, is_active, is_admin) {
         this.id = User.last_id++
         this.email = email.toLowerCase()
