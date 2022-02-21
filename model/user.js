@@ -37,17 +37,17 @@ class User {
 
     static disable_user(user_id) { //todo what do we do if the user was the admin!?
         const user = this.get_user_by_id(user_id)
-        if(user){
+        if (user) {
             user.is_active = false
         }
-        if(user.is_logged_in){
+        if (user.is_logged_in) {
             // user.token.disable() todo (should be done after we created a token class)
         }
     }
 
     static enable_user(user_id) {
         const user = this.get_user_by_id(user_id)
-        if(user) user.is_active = true
+        if (user) user.is_active = true
     }
 
     static login_user(user, token) {
@@ -84,6 +84,7 @@ class User {
 
     static get_attributes(user_id) {
         const user = User.get_user_by_id(user_id)
+        if (!user) return null
         return {
             'email': user.email,
             'phone number': user.phone_number,
@@ -97,13 +98,44 @@ class User {
         }
     }
 
-    static edit_attributes(user_id, attributes) {
+    static edit_administrative_attributes(user_id, attributes) {
         const user = User.get_user_by_id(user_id)
         if (user) {
-            user.edit(attributes.full_name, attributes.department, attributes.organization_level, attributes.office, attributes.working_hours, attributes.role, attributes.is_active)
+            user.edit(attributes.full_name, attributes.department, attributes.organization_level,
+                attributes.office, attributes.working_hours, attributes.role, attributes.is_active)
             return true
         }
         return false
+    }
+
+    static filter_by_department(department_name, current_list) {
+        const new_list = []
+        if (!current_list) {
+            current_list = User.all_users.slice()
+        }
+        if (!department_name) return current_list
+        for (const user in current_list) {
+            if (user.department === department_name)
+                new_list.push(user)
+        }
+        return new_list
+    }
+
+    static filter_by_office(office_name, current_list) {
+        const new_list = []
+        if (!current_list) {
+            current_list = User.all_users.slice()
+        }
+        if (!office_name) return current_list
+        for (const user in current_list) {
+            if (user.office === office_name)
+                new_list.push(user)
+        }
+        return new_list
+    }
+
+    static search(department_name, office_name) {
+        return this.filter_by_office(office_name, this.filter_by_department(department_name))
     }
 
     constructor(email, password, phone_number, full_name, department, organization, office, working_hours, role, is_active, is_admin) {
@@ -117,6 +149,8 @@ class User {
         this.office = office
         this.working_hours = working_hours
         this.role = role
+
+        if (!is_active) this.is_active = true
         this.is_active = is_active
 
         this.is_logged_in = false
@@ -142,6 +176,14 @@ class User {
 
     change_password(new_password) {
         this.hashed_password = hash_password(new_password)
+    }
+
+    change_name(new_name) {
+        this.full_name = new_name
+    }
+
+    change_working_hours(new_working_hour) {
+        this.working_hours = new_working_hour
     }
 
     async is_password_correct(entered_password) {

@@ -66,5 +66,17 @@ app.post('/admin_panel/show_employee_list/enable_employee', (req, res) => {
     res.status(response_obj.status_code).send(response_obj.get_json())
 })
 
+//can only be used for editing full name and working hours
+app.post('/edit_profile', (req, res) => {
+    const response_obj = request_handler.edit_oneself(req.body)
+    res.status(response_obj.status_code).send(response_obj.get_json())
+})
+
+app.post('/search', (req, res) => {
+    const response_obj = request_handler.search_employees(req.body)
+    res.status(response_obj.status_code).send(response_obj.get_json())
+})
+
+
 module.exports = app
 

@@ -9,5 +9,18 @@ const view_employee = new Action()
 const edit_employee = new Action()
 const disable_employee = new Action()
 const enable_employee = new Action()
+const edit_oneself = new Action()
+const search_employees= new Action()
 
-module.exports = {create_employee, sign_up_admin, logout, show_employee_list, view_employee, edit_employee, disable_employee, enable_employee}
+module.exports = {
+    create_employee,
+    sign_up_admin,
+    logout,
+    show_employee_list,
+    view_employee,
+    edit_employee,
+    disable_employee,
+    enable_employee,
+    edit_oneself,
+    search_employees
+}
