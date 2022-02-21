@@ -1,37 +1,19 @@
 class Response {
 
-    static create_with_json(json, status_code) {
-        if (!json) return null
-        const is_successful = json.status
-        const message = json.message
-        const token = json.token
-        return new Response(status_code, is_successful, message, token)
-
-    }
-
     static get_empty_response() {
         return new Response()
     }
 
-    constructor(status_code, is_successful, message, token) {
-
+    constructor(status_code, message, token) {
         if (!status_code)
             this.status_code = status_code
         this.message = message
         this.token = token
-        this.is_successful = is_successful
         this.json = this.generate_json()
     }
 
     generate_json() {
-        let success
-        if (this.is_successful)
-            success = 'success'
-        else success = 'failure'
-        if (this.token) {
-            return {'status': success, 'message': this.message, 'token': this.token}
-        }
-        return {'status': success, 'message': this.message}
+        return {'message': this.message}
     }
 
     get_json() {
@@ -40,19 +22,22 @@ class Response {
         return this.json
     }
 
-    edit(status_code, is_successful, message, token) {
+    edit(status_code, message, token) {
         this.status_code = status_code || this.status_code
         this.message = message || this.message
         this.token = token || this.token
-        this.is_successful = is_successful || this.is_successful
         this.json = this.generate_json()
     }
 
-    set_redirecting(should_redirect, redirect_link) {
-        this.should_redirect = should_redirect
+    set_redirecting(redirect_link, redirect_message) {
+        this.should_redirect = true
         this.redirecting_link = redirect_link
+        this.message = redirect_message
     }
 
+    send_response(res) {
+        res.status(this.status_code).send(this.get_json()).header('Authorization', this.token)
+    }
 }
 
 module.exports = Response

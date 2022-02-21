@@ -40,9 +40,6 @@ class User {
         if (user) {
             user.is_active = false
         }
-        if (user.is_logged_in) {
-            // user.token.disable() todo (should be done after we created a token class)
-        }
     }
 
     static enable_user(user_id) {
