@@ -29,10 +29,33 @@ class User {
         return null
     }
 
+    static can_login(user) {
+        if (user)
+            return user.is_active && !user.is_logged_in
+        return false
+    }
+
+    static disable_user(user_id) { //todo what do we do if the user was the admin!?
+        const user = this.get_user_by_id(user_id)
+        if(user){
+            user.is_active = false
+        }
+        if(user.is_logged_in){
+            // user.token.disable() todo (should be done after we created a token class)
+        }
+    }
+
+    static enable_user(user_id) {
+        const user = this.get_user_by_id(user_id)
+        if(user) user.is_active = true
+    }
+
     static login_user(user, token) {
-        User.online_users.push(user.id)
-        user.is_logged_in = true
-        user.token = token
+        if (User.can_login(user)) {
+            User.online_users.push(user.id)
+            user.is_logged_in = true
+            user.token = token
+        }
     }
 
     static logout_user(user) {

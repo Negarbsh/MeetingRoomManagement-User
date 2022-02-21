@@ -55,5 +55,16 @@ app.post('/admin_panel/show_employee_list/edit_employee', (req, res) => {
     res.status(response_obj.status_code).send(response_obj.get_json())
 })
 
+app.post('/admin_panel/show_employee_list/disable_employee', (req, res) => {
+    const response_obj = request_handler.disable_employee(req.body)
+    res.status(response_obj.status_code).send(response_obj.get_json())
+})
+
+
+app.post('/admin_panel/show_employee_list/enable_employee', (req, res) => {
+    const response_obj = request_handler.enable_employee(req.body)
+    res.status(response_obj.status_code).send(response_obj.get_json())
+})
+
 module.exports = app
 

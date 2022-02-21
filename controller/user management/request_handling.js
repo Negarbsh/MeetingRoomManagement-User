@@ -58,8 +58,8 @@ function login(data) {
 
         if (!user || !(user.is_password_correct(given_pass))) {
             response_obj.edit(invalid_request_status, false, 'Email or password is not correct!')
-        } else if (user.is_logged_in) {
-            response_obj.edit(invalid_request_status, false, 'User is already logged in!')
+        } else if (User.can_login(user)) {
+            response_obj.edit(invalid_request_status, false, 'Invalid login!') //either the user is disabled or it is already logged in
         } else {
             const token = access_manager.create_access_token(given_email, user.id)
             User.login_user(user, token)
@@ -141,4 +141,34 @@ function edit_employee(data) {
     return response_obj
 }
 
-module.exports = {sign_up_admin, sign_up_employee, login, logout, show_employee_list, view_employee, edit_employee}
+function disable_employee(data) {
+    const actor = access_manager.authenticate_actor(data.token)
+    const response_obj = Response.get_empty_response()
+
+    if (access_manager.has_access(actor, Action.disable_employee)) {
+        if (!'employee_id' in data)
+            response_obj.edit(bad_request_status, false, 'No employee id specified!')
+        else {
+            User.disable_user(data.employee_id)
+            response_obj.edit(success_status, true, 'Employee is disabled successfully!')
+        }
+    } else response_obj.edit(access_denied_status, false, 'Invalid access.')
+    return response_obj
+}
+
+function enable_employee (data) {
+    const actor = access_manager.authenticate_actor(data.token)
+    const response_obj = Response.get_empty_response()
+
+    if (access_manager.has_access(actor, Action.enable_employee)) {
+        if (!'employee_id' in data)
+            response_obj.edit(bad_request_status, false, 'No employee id specified!')
+        else {
+            User.enable_user(data.employee_id)
+            response_obj.edit(success_status, true, 'Employee is enabled successfully!')
+        }
+    } else response_obj.edit(access_denied_status, false, 'Invalid access.')
+    return response_obj
+}
+
+module.exports = {sign_up_admin, sign_up_employee, login, logout, show_employee_list, view_employee, edit_employee,  disable_employee,  enable_employee}

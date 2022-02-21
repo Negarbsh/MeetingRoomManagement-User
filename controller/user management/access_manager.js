@@ -8,7 +8,8 @@ function has_access(user, action) {
         return true
     if (!user) return false //if the user didn't exist (which happens when the token is wrong, it has no access!)
     switch (action) {
-        case Action.create_employee || Action.view_employee || Action.edit_employee || Action.show_employee_list:
+        case Action.create_employee || Action.view_employee || Action.edit_employee || Action.show_employee_list
+        || Action.disable_employee || Action.enable_employee:
             return user === User.admin && user.is_logged_in
         case Action.logout:
             return user.is_logged_in
