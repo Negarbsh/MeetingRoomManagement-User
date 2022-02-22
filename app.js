@@ -17,15 +17,15 @@ app.post('/sign_up_admin', async (req, res) => {
 //the request should be a json that has all user's fields
 app.post('/create_employee', async (req, res) => {
     const data = req.body
-    const response_obj = request_handler.sign_up_employee(data)
+    const response_obj = await request_handler.sign_up_employee(data)
     response_obj.send_response(res)
 
 });
 
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const data = req.body
-    const response_obj = request_handler.login(data)
+    const response_obj = await request_handler.login(data)
     response_obj.send_response(res)
 })
 

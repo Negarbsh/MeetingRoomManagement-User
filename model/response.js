@@ -36,7 +36,8 @@ class Response {
     }
 
     send_response(res) {
-        res.status(this.status_code).send(this.get_json()).header('Authorization', this.token)
+        res.header('Authorization', this.token)
+        res.status(this.status_code).send(this.get_json())
     }
 }
 

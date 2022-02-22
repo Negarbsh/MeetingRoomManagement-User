@@ -83,6 +83,7 @@ test("login admin first time, unsuccessful", async () => {
     expect(response.status).toBe(406)
     const data = response.body
     expect(data.message).toBe('Email or password is not correct!')
+    // admin_token = response.header('Authorization')
 })
 
 
@@ -105,8 +106,7 @@ test("login admin second time, unsuccessful", async () => {
     })
     expect(response.status).toBe(406)
     const data = response.body
-    admin_token = data.token
-    expect(data.message).toBe('User is already logged in!')
+    expect(data.message).toBe('Invalid login!')
 })
 
 test("create employee 1, successful", async () => {

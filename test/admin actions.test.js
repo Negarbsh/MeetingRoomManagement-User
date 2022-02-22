@@ -31,7 +31,6 @@ beforeAll(() => {
     }
 })
 
-
 test('create employee with valid token', async () => {
     const token = await access_manager.create_access_token('admin@email.com')
     User.login_user(admin, token)
@@ -53,7 +52,6 @@ test('create employee with valid token', async () => {
     expect(response.status).toBe(200)
     expect(User.get_user_by_email('another email')).toBeDefined()
 })
-
 
 test('create employee with invalid token', async () => {
     const token = await access_manager.create_access_token('admin@email.com')

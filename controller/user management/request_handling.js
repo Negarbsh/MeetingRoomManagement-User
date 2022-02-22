@@ -29,8 +29,8 @@ function sign_up_admin(signup_data) {
     return response_obj
 }
 
-function sign_up_employee(signup_data) {
-    const actor = access_manager.authenticate_actor(signup_data.token)
+async function sign_up_employee(signup_data) {
+    const actor = await access_manager.authenticate_actor(signup_data.token)
 
     const response_obj = Response.get_empty_response()
 
@@ -48,7 +48,7 @@ function sign_up_employee(signup_data) {
     return response_obj
 }
 
-function login(data) {
+async function login(data) {
     const response_obj = Response.get_empty_response()
 
     let given_email = data.email
@@ -59,7 +59,7 @@ function login(data) {
         given_email = given_email.toLowerCase()
         const user = User.get_user_by_email(given_email)
 
-        if (!user || !(user.is_password_correct(given_pass))) {
+        if (!user || !(await user.is_password_correct(given_pass))) {
             response_obj.edit(invalid_request_status, 'Email or password is not correct!')
         } else if (!User.can_login(user)) {
             response_obj.edit(invalid_request_status, 'Invalid login!') //either the user is disabled or it is already logged in
