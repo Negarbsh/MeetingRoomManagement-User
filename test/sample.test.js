@@ -1,6 +1,6 @@
 // tests should be run together
 
-const app = require("../app")
+const app = require("../presentation/app")
 const supertest = require("supertest");
 
 const right_admin_data = {

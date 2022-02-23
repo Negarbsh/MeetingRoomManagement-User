@@ -1,6 +1,6 @@
-const User = require("../../model/user");
+const User = require("../model/user");
 const jwt = require("jsonwebtoken");
-Action = require('./actions')
+Action = require('../model/actions')
 
 process.env.TOKEN_KEY = "it should've been secret!" //todo it shouldn't be hard-coded like this
 

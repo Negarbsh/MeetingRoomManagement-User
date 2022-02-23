@@ -6,15 +6,16 @@ function hash_password(password) {
 
 class User {
 
-    static can_have_admin() {
+    static has_admin() {
         return User.admin === null
     }
 
     static set_admin(admin) {
-        if (this.can_have_admin())
+        if (!this.has_admin())
             User.admin = admin
     }
 
+    //todo move from here
     static get_user_by_email(email) {
         for (const user of User.all_users) {
             if (user.email === email.toLowerCase()) return user
@@ -22,6 +23,7 @@ class User {
         return null
     }
 
+    //todo move from here
     static get_user_by_id(id) {
         for (const user of User.all_users) {
             if (user.id === id) return user
@@ -69,7 +71,7 @@ class User {
         return User.is_password_strong(given_password)
     }
 
-
+    //todo I guess it shouldn't be here
     static is_password_strong(given_password) {
         if (given_password.length < 10) return false
         return /[0-9]+/.test(given_password) && /[A-Za-z]+/.test(given_password)
@@ -169,7 +171,6 @@ class User {
         })
     }
 
-
     get_active_status() {
         if (this.is_active)
             return 'active'
@@ -208,6 +209,7 @@ class User {
 
 }
 
+//todo move from here
 function initiateUser() {
     User.all_users = []
     User.online_users = []

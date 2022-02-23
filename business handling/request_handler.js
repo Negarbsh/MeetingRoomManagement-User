@@ -1,7 +1,7 @@
-const User = require("../../model/user");
+const User = require("../model/user");
 const access_manager = require("./access_manager")
-const Action = require("./actions")
-const Response = require("../../model/response")
+const Action = require("../model/actions")
+const Response = require("../model/response")
 
 const success_status = 200
 const access_denied_status = 403
@@ -11,11 +11,10 @@ const bad_request_status = 400
 const redirect_status = 302 //not sure if it's correct
 
 
-
 function sign_up_admin(signup_data) {
     const response_obj = Response.get_empty_response()
 
-    if (!User.can_have_admin()) {
+    if (User.has_admin()) {
         response_obj.edit(invalid_request_status, 'An admin already exists!')
     } else {
         if (User.can_create_user(signup_data.email, signup_data.password)) {
