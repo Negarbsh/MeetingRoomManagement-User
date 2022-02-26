@@ -1,7 +1,7 @@
 const app = require('../presentation/app')
 const User = require('../model/user')
 const supertest = require("supertest");
-const access_manager = require('../business handling/access_manager')
+const access_manager = require('../business logic/access_manager')
 
 
 test('get working hour of another employee', async () => {

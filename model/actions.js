@@ -12,6 +12,7 @@ const enable_employee = new Action()
 const edit_oneself = new Action()
 const search_employees = new Action()
 const get_working_hour = new Action()
+const login = new Action()
 
 module.exports = {
     create_employee,
@@ -24,5 +25,6 @@ module.exports = {
     enable_employee,
     edit_oneself,
     search_employees,
-    get_working_hour
+    get_working_hour,
+    login
 }

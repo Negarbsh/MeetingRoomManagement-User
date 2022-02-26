@@ -1,7 +1,7 @@
 const app = require('../presentation/app')
 const User = require('../model/user')
 const supertest = require("supertest");
-const access_manager = require('../business handling/access_manager')
+const access_manager = require('../business logic/access_manager')
 
 let admin, admin_data, emp_data;
 

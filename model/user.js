@@ -5,7 +5,6 @@ function hash_password(password) {
 }
 
 class User {
-
     static has_admin() {
         return User.admin === null
     }
@@ -13,14 +12,6 @@ class User {
     static set_admin(admin) {
         if (!this.has_admin())
             User.admin = admin
-    }
-
-    //todo move from here
-    static get_user_by_email(email) {
-        for (const user of User.all_users) {
-            if (user.email === email.toLowerCase()) return user
-        }
-        return null
     }
 
     //todo move from here
@@ -66,7 +57,7 @@ class User {
     }
 
     static can_create_user(email, given_password) {
-        const user = User.get_user_by_email(email)
+        const user = get_user_by_email(email)
         if (user) return false
         return User.is_password_strong(given_password)
     }
@@ -162,13 +153,6 @@ class User {
         if (is_admin) User.set_admin(this)
         this.is_admin = is_admin
 
-        User.all_users.push(this)
-        if (!is_admin) User.employee_list.push({
-            "id": this.id,
-            "full name": this.full_name,
-            "department": this.department,
-            "office": this.office
-        })
     }
 
     get_active_status() {
@@ -209,14 +193,6 @@ class User {
 
 }
 
-//todo move from here
-function initiateUser() {
-    User.all_users = []
-    User.online_users = []
-    User.last_id = 0
-    User.admin = null
-    User.employee_list = []
-}
+User.last_id = 0
 
-initiateUser()
 module.exports = User
