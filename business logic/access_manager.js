@@ -1,7 +1,7 @@
 const Action = require('../model/actions');
 const user_manager = require('../data access/user manager')
+const jwt = require("jsonwebtoken");
 
-process.env.TOKEN_KEY = "it should've been secret!" //todo it shouldn't be hard-coded like this
 
 function has_access(actor_mail, action) {
     if (action === Action.sign_up_admin)
@@ -20,16 +20,16 @@ function has_access(actor_mail, action) {
     }
 }
 
-//
-// function create_access_token(email, id) {
-//     return jwt.sign(
-//         {user_id: id, email: email},
-//         process.env.TOKEN_KEY,
-//         {
-//             expiresIn: "2h",
-//         }
-//     );
-// }
+
+function create_access_token(email, id) {
+    return jwt.sign(
+        {user_id: id, email: email},
+        process.env.TOKEN_KEY,
+        {
+            expiresIn: "2h",
+        }
+    );
+}
 
 
-module.exports = {has_access}
+module.exports = {has_access, create_access_token}

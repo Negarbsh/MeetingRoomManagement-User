@@ -21,9 +21,7 @@ function sign_up_admin(email, password, phone_number, full_name, department, org
         if (user_manager.can_create_user(email, password)) {
             user_manager.create_admin(email, password, phone_number, full_name, department, organization_level, office, working_hours)
             response_obj.edit(success_status, 'Admin user is created successfully!')
-        } else
-            response_obj.edit(invalid_request_status, 'Sign up is invalid!')
-
+        } else response_obj.edit(invalid_request_status, 'Sign up is invalid!')
     }
     return response_obj
 }
@@ -55,11 +53,10 @@ async function login(given_email, given_password) {
     } else if (!user_manager.can_login(user)) {
         response_obj.edit(invalid_request_status, 'Invalid login!')
     } else {
-        const token = access_manager.create_access_token(given_email, user.id)
+        const token = await access_manager.create_access_token(given_email, user.id)
         user_manager.login_user(user, token)
         response_obj.edit(success_status, 'login successful!', token)
     }
-
     return response_obj
 }
 
@@ -140,7 +137,7 @@ function edit_oneself(actor_mail, attribute_name, new_value) {
     if (access_manager.has_access(actor_mail, Action.edit_oneself)) {
         switch (attribute_name) { //todo this can become enum
             case "full name":
-                user_manager.change_name(actor_mail, new_value)
+                user_manager.change_full_name(actor_mail, new_value)
                 response_obj.edit(success_status, 'Full name is edited successfully!')
                 break
             case "working hours":

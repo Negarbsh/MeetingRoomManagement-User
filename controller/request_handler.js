@@ -3,8 +3,7 @@ const business_handler = require("../business logic/business_handler")
 
 
 async function sign_up_admin(data) {
-    if (!(data.email && data.password && data.phone_number && data.full_name && data.department && data.organization_level && data.office &&
-        data.working_hours))
+    if (!(data.email && data.password && data.phone_number && data.full_name && data.department && data.organization_level && data.office && data.working_hours))
         return Response.get_bad_request_response('Signup fields are not complete.')
     else return business_handler.sign_up_admin(data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level, data.office, data.working_hours)
 }
@@ -22,7 +21,7 @@ async function sign_up_employee(actor_mail, data) {
 async function login(data) {
     if (!(data.email && data.password))
         return Response.get_bad_request_response('Email and password are required!')
-    else await business_handler.login(data.email, data.password)
+    else return await business_handler.login(data.email, data.password)
 }
 
 async function logout(actor_email) {

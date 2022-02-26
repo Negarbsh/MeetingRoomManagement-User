@@ -32,7 +32,7 @@ class Response {
 
     get_json() {
         if (!this.json)
-            this.generate_json()
+            this.json = this.generate_json()
         return this.json
     }
 
@@ -50,7 +50,7 @@ class Response {
     }
 
     send_response(res) {
-        res.header('Authorization', this.token)
+        res.header('token', this.token)
         res.status(this.status_code).send(this.get_json())
     }
 }

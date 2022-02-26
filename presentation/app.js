@@ -26,7 +26,7 @@ function decode_token(req) {
 
 app.post('/sign_up_admin', async (req, res) => {
     const data = req.body
-    const response_obj = request_handler.sign_up_admin(data)
+    const response_obj = await request_handler.sign_up_admin(data)
     response_obj.send_response(res)
 });
 
@@ -38,7 +38,7 @@ app.post('/create_employee', async (req, res) => {
         response_obj = Response.get_invalid_token_response()
     else {
         const data = req.body
-        response_obj = request_handler.sign_up_employee(decoded_token.email, data)
+        response_obj = await request_handler.sign_up_employee(decoded_token.email, data)
     }
     response_obj.send_response(res)
 });
@@ -46,7 +46,7 @@ app.post('/create_employee', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     const data = req.body
-    const response_obj = request_handler.login(data)
+    const response_obj = await request_handler.login(data)
     response_obj.send_response(res)
 })
 
@@ -57,85 +57,85 @@ app.post('/logout', async (req, res) => {
     if (!decoded_token)
         response_obj = Response.get_invalid_token_response()
     else {
-        response_obj = request_handler.logout(decoded_token.email)
+        response_obj = await request_handler.logout(decoded_token.email)
     }
     response_obj.send_response(res)
 })
 
 
-app.post('/admin_panel/show_employee_list', (req, res) => {
+app.post('/admin_panel/show_employee_list', async (req, res) => {
     const decoded_token = decode_token(req)
     let response_obj
     if (!decoded_token)
         response_obj = Response.get_invalid_token_response()
     else {
         const data = req.body
-        response_obj = request_handler.show_employee_list(decoded_token.email, data)
+        response_obj = await request_handler.show_employee_list(decoded_token.email, data)
     }
     response_obj.send_response(res)
 });
 
 
-app.post('/admin_panel/show_employee_list/view_employee', (req, res) => {
+app.post('/admin_panel/show_employee_list/view_employee', async (req, res) => {
     const decoded_token = decode_token(req)
     let response_obj
     if (!decoded_token)
         response_obj = Response.get_invalid_token_response()
     else {
         const data = req.body
-        response_obj = request_handler.view_employee(decoded_token.email, data)
+        response_obj = await request_handler.view_employee(decoded_token.email, data)
     }
     response_obj.send_response(res)
 })
 
 
-app.post('/admin_panel/show_employee_list/edit_employee', (req, res) => {
+app.post('/admin_panel/show_employee_list/edit_employee', async (req, res) => {
     const decoded_token = decode_token(req)
     let response_obj
     if (!decoded_token)
         response_obj = Response.get_invalid_token_response()
     else {
         const data = req.body
-        response_obj = request_handler.edit_employee(decoded_token.email, data)
+        response_obj = await request_handler.edit_employee(decoded_token.email, data)
     }
     response_obj.send_response(res)
 })
 
 
-app.post('/admin_panel/show_employee_list/disable_employee', (req, res) => {
+app.post('/admin_panel/show_employee_list/disable_employee', async (req, res) => {
     const decoded_token = decode_token(req)
     let response_obj
     if (!decoded_token)
         response_obj = Response.get_invalid_token_response()
     else {
         const data = req.body
-        response_obj = request_handler.disable_employee(decoded_token.email, data)
+        response_obj = await request_handler.disable_employee(decoded_token.email, data)
     }
     response_obj.send_response(res)
 })
 
 
-app.post('/admin_panel/show_employee_list/enable_employee', (req, res) => {
+app.post('/admin_panel/show_employee_list/enable_employee', async (req, res) => {
     const decoded_token = decode_token(req)
     let response_obj
     if (!decoded_token)
         response_obj = Response.get_invalid_token_response()
     else {
         const data = req.body
-        response_obj = request_handler.enable_employee(decoded_token.email, data)
+        response_obj = await request_handler.enable_employee(decoded_token.email, data)
     }
     response_obj.send_response(res)
 })
 
 
-app.post('/edit_profile', (req, res) => {
+app.post('/edit_profile', async (req, res) => {
     const decoded_token = decode_token(req)
     let response_obj
     if (!decoded_token)
         response_obj = Response.get_invalid_token_response()
     else {
         const data = req.body
-        response_obj = request_handler.edit_profile(decoded_token.email, data)
+        response_obj = await request_handler.edit_profile(decoded_token.email, data)
     }
     response_obj.send_response(res)
 })
@@ -153,14 +153,14 @@ app.post('/search', (req, res) => {
     response_obj.send_response(res)
 })
 
-app.post('/get_working_hour', (req, res) => {
+app.post('/get_working_hour', async (req, res) => {
     const decoded_token = decode_token(req)
     let response_obj
     if (!decoded_token)
         response_obj = Response.get_invalid_token_response()
     else {
         const data = req.body
-        response_obj = request_handler.get_working_hour(decoded_token.email, data)
+        response_obj = await request_handler.get_working_hour(decoded_token.email, data)
     }
     response_obj.send_response(res)
 })
