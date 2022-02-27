@@ -1,6 +1,6 @@
 const User = require('../model/user')
 
-const all_users = {}
+const all_users_by_id = {}
 const all_users_by_mail = {}
 const online_users = []
 let admin = null
@@ -11,7 +11,7 @@ function create_employee(email, password, phone_number, full_name, department, o
     const user_id = last_id++
     const user = new User(user_id, email.toLowerCase(), password, phone_number, full_name,
         department, organization_level, office, working_hours, role, true, false)
-    all_users[user_id] = user
+    all_users_by_id[user_id] = user
     all_users_by_mail[email.toLowerCase()] = user
     employee_list[user_id] = {
         "id": user_id,
@@ -26,7 +26,7 @@ function create_admin(email, password, phone_number, full_name, department, orga
     const user_id = last_id++
     const user = new User(user_id, email, password, phone_number, full_name,
         department, organization_level, office, working_hours, 'admin', true, true)
-    all_users[user_id] = user
+    all_users_by_id[user_id] = user
     all_users_by_mail[email.toLowerCase()] = user
     set_admin(user)
     return user
@@ -37,7 +37,7 @@ function get_user_by_email(email) {
 }
 
 function get_user_by_id(id) {
-    return all_users[id]
+    return all_users_by_id[id]
 }
 
 
@@ -133,7 +133,7 @@ function edit_administrative_attributes(user_id, attributes) {
 function filter_by_department(department_name, current_search_space) {
     const new_space = {}
     if (!current_search_space) {
-        current_search_space = {...all_users}
+        current_search_space = {...all_users_by_id}
     }
     if (!department_name) return current_search_space
     for (const user_id in current_search_space) {
@@ -147,7 +147,7 @@ function filter_by_department(department_name, current_search_space) {
 function filter_by_office(office_name, current_search_space) {
     const new_space = {}
     if (!current_search_space) {
-        current_search_space = {...all_users}
+        current_search_space = {...all_users_by_id}
     }
     if (!office_name) return current_search_space
     for (const user_id in current_search_space) {
@@ -180,6 +180,18 @@ function change_full_name(email, new_full_name) {
     user.change_name(new_full_name)
 }
 
+function delete_user(email) {
+    const user = get_user_by_email(email)
+    if (user) {
+        all_users_by_mail.delete(email)
+        all_users_by_id.delete(user.id)
+
+        const index = online_users.indexOf(user.id)
+        if (index !== -1)
+            online_users.splice(index)
+    }
+}
+
 
 module.exports = {
     create_admin,
@@ -199,5 +211,6 @@ module.exports = {
     get_working_hour,
     get_admin_mail,
     change_full_name,
-    change_working_hours
+    change_working_hours,
+    delete_user
 }

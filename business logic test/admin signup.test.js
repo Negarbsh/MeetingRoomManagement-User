@@ -1,52 +1,30 @@
-const app = require('../presentation/app')
-const User = require('../model/user')
-const supertest = require("supertest");
-const access_manager = require("../business logic/access_manager");
+const user_manager = require('../data access/user manager')
+const business_handler = require('../business logic/business_handler')
 
-afterEach(() => {
-    User.all_users = []
-    User.online_users = []
-    User.last_id = 0
-    User.admin = null
-    User.employee_list = []
+test('signup admin with invalid password, unsuccessful', async () => {
+    const response = business_handler.sign_up_admin('admin email', 'weak password')
+
+    expect(response.status_code).toBe(406)
+    expect(user_manager.get_user_by_email('admin email')).toBe(undefined)
+    expect(user_manager.get_admin_mail()).toBe(null)
 })
 
-test('sign up admin successfully', async () => {
-    const response = await supertest(app).post('/sign_up_admin').send({
-        "email": "admin mail",
-        "password": "a strong password 123"
-    })
 
-    expect(response.status).toBe(200)
-    expect(User.get_user_by_email('admin mail')).toBeTruthy()
+test('signup admin for the first time, successful', async () => {
+    const response = business_handler.sign_up_admin('admin email', '1 strong password')
+
+    expect(response.status_code).toBe(200)
+    expect(user_manager.get_user_by_email('admin email')).toBeDefined()
+    expect(user_manager.get_admin_mail()).toBe('admin email')
+
+    user_manager.delete_user('admin mail')
 })
 
-test('sign up admin with short password, unsuccessful', async () => {
-    const response = await supertest(app).post('/sign_up_admin').send({
-        "email": "admin mail",
-        "password": "weak1"
-    })
+test('signup admin for the second time, unsuccessful', async ()=>{
+    business_handler.sign_up_admin('admin email', '1 strong password')
+    const response = business_handler.sign_up_admin('second admin email', '1 strong password')
 
-    expect(response.status).toBe(406)
-    expect(User.get_user_by_email('admin mail')).toBeNull()
+    expect(response.status_code).toBe(406)
+    expect(user_manager.get_user_by_email('second admin email')).toBeUndefined()
+    expect(user_manager.get_admin_mail()).toBe('admin email')
 })
-
-test('sign up admin with password without digit, unsuccessful', async () => {
-    const response = await supertest(app).post('/sign_up_admin').send({
-        "email": "admin mail",
-        "password": "a password without digits!"
-    })
-
-    expect(response.status).toBe(406)
-    expect(User.get_user_by_email('admin mail')).toBeNull()
-})
-//
-// test('sign up admin for the second time, unsuccessful', async () => {
-//     const response = await supertest(app).post('/sign_up_admin').send({
-//         "email": "another admin mail",
-//         "password": "a strong password 123"
-//     })
-//
-//     expect(response.status).toBe(406)
-//     expect(User.get_user_by_email('admin mail')).toBeNull()
-// })
