@@ -19,6 +19,7 @@ function create_employee(email, password, phone_number, full_name, department, o
         "department": department,
         "office": office
     }
+    return user
 }
 
 function create_admin(email, password, phone_number, full_name, department, organization_level, office, working_hours) {
@@ -28,6 +29,7 @@ function create_admin(email, password, phone_number, full_name, department, orga
     all_users[user_id] = user
     all_users_by_mail[email.toLowerCase()] = user
     set_admin(user)
+    return user
 }
 
 function get_user_by_email(email) {
@@ -70,15 +72,15 @@ function enable_user(user_id) {
     if (user) user.is_active = true
 }
 
-function login_user(user, token) {
+function login_user(user) {
     if (can_login(user)) {
         online_users.push(user.id)
         user.is_logged_in = true
-        user.token = token
     }
 }
 
-function logout_user(user) {
+function logout_user(mail) {
+    const user = get_user_by_email(mail)
     const index = online_users.indexOf(user.id)
     if (index === -1) return -1
     online_users.splice(index)
@@ -128,30 +130,32 @@ function edit_administrative_attributes(user_id, attributes) {
     return false
 }
 
-function filter_by_department(department_name, current_list) {
-    const new_list = []
-    if (!current_list) {
-        current_list = all_users.slice()
+function filter_by_department(department_name, current_search_space) {
+    const new_space = {}
+    if (!current_search_space) {
+        current_search_space = {...all_users}
     }
-    if (!department_name) return current_list
-    for (const user in current_list) {
+    if (!department_name) return current_search_space
+    for (const user_id in current_search_space) {
+        const user = current_search_space[user_id]
         if (user.department === department_name)
-            new_list.push(user)
+            new_space[user_id] = user
     }
-    return new_list
+    return new_space
 }
 
-function filter_by_office(office_name, current_list) {
-    const new_list = []
-    if (!current_list) {
-        current_list = all_users.slice()
+function filter_by_office(office_name, current_search_space) {
+    const new_space = {}
+    if (!current_search_space) {
+        current_search_space = {...all_users}
     }
-    if (!office_name) return current_list
-    for (const user in current_list) {
+    if (!office_name) return current_search_space
+    for (const user_id in current_search_space) {
+        const user = current_search_space[user_id]
         if (user.office === office_name)
-            new_list.push(user)
+            new_space[user_id] = user
     }
-    return new_list
+    return new_space
 }
 
 function search(department_name, office_name) {
@@ -167,13 +171,13 @@ function get_working_hour(user_id) {
 
 function change_working_hours(email, new_working_hours) {
     const user = get_user_by_email(email)
-    user.working_hours = new_working_hours
+    user.change_working_hours(new_working_hours)
 }
 
 
 function change_full_name(email, new_full_name) {
     const user = get_user_by_email(email)
-    user.full_name = new_full_name
+    user.change_name(new_full_name)
 }
 
 

@@ -61,6 +61,8 @@ async function enable_employee(actor_mail, data) {
 async function edit_profile(actor_mail, data) {
     if (!'attribute' in data)
         return Response.get_bad_request_response('No "attribute" specified!')
+    if (data.attribute !== 'full_name' && data.attribute !== 'working_hour')
+        return Response.get_bad_request_response('Attribute should be "working_hour" or "full_name"')
     if (!'new_value' in data)
         return Response.get_bad_request_response('No "new_value" specified!')
     return business_handler.edit_oneself(actor_mail, data.attribute, data.new_value)

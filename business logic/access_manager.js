@@ -7,14 +7,14 @@ function has_access(actor_mail, action) {
     if (action === Action.sign_up_admin)
         return true
     const user = user_manager.get_user_by_email(actor_mail)
-    if (!actor_mail) return false //if the user didn't exist (which happens when the token is wrong, it has no access!)
+    if (!actor_mail || !user) return false //if the user didn't exist (which happens when the token is wrong, it has no access!)
     if (!user.is_active) return false //a disabled user cannot do anything, even if they are logged in!
     switch (action) {
         case Action.create_employee || Action.view_employee || Action.edit_employee || Action.show_employee_list
         || Action.disable_employee || Action.enable_employee:
             return actor_mail === user_manager.get_admin_mail() && user.is_logged_in
         case Action.logout || Action.edit_oneself || Action.search_employees || Action.get_working_hour:
-            return actor_mail.is_logged_in
+            return user.is_logged_in
         default:
             return true
     }

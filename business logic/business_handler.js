@@ -54,7 +54,7 @@ async function login(given_email, given_password) {
         response_obj.edit(invalid_request_status, 'Invalid login!')
     } else {
         const token = await access_manager.create_access_token(given_email, user.id)
-        user_manager.login_user(user, token)
+        user_manager.login_user(user)
         response_obj.edit(success_status, 'login successful!', token)
     }
     return response_obj
@@ -136,11 +136,11 @@ function edit_oneself(actor_mail, attribute_name, new_value) {
     const response_obj = Response.get_empty_response()
     if (access_manager.has_access(actor_mail, Action.edit_oneself)) {
         switch (attribute_name) { //todo this can become enum
-            case "full name":
+            case "full_name":
                 user_manager.change_full_name(actor_mail, new_value)
                 response_obj.edit(success_status, 'Full name is edited successfully!')
                 break
-            case "working hours":
+            case "working_hours":
                 user_manager.change_working_hours(actor_mail, new_value)
                 response_obj.edit(success_status, 'Working hour is edited successfully!')
                 break
