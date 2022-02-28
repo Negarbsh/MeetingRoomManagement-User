@@ -10,6 +10,11 @@ class Response {
         return response_obj
     }
 
+    static get_unexpected_condition(){
+        const res = this.get_empty_response()
+        res.edit(500, 'Oops! Something went wrong :(')
+    }
+
     static get_bad_request_response(message) {
         const response_obj = this.get_empty_response()
         if (!message)

@@ -1,43 +1,57 @@
-const User = require('../model/user')
+const User = require('../models/user')
+const db = require('../db/db_setup')
 
-const all_users_by_id = {}
-const all_users_by_mail = {}
-const online_users = []
-let admin = null
-const employee_list = {}
-let last_id = 0
+const bcrypt = require("bcryptjs");
 
-function create_employee(email, password, phone_number, full_name, department, organization_level, office, working_hours, role) {
-    const user_id = last_id++
-    const user = new User(user_id, email.toLowerCase(), password, phone_number, full_name,
-        department, organization_level, office, working_hours, role, true, false)
-    all_users_by_id[user_id] = user
-    all_users_by_mail[email.toLowerCase()] = user
-    employee_list[user_id] = {
-        "id": user_id,
-        "full name": full_name,
-        "department": department,
-        "office": office
-    }
-    return user
+function hash_password(password) {
+    return bcrypt.hashSync(password, 10); //todo hash salt
 }
 
-function create_admin(email, password, phone_number, full_name, department, organization_level, office, working_hours) {
-    const user_id = last_id++
-    const user = new User(user_id, email, password, phone_number, full_name,
-        department, organization_level, office, working_hours, 'admin', true, true)
-    all_users_by_id[user_id] = user
-    all_users_by_mail[email.toLowerCase()] = user
+let admin = null
+
+async function create_employee(email, password, phone_number, full_name, department, organization_level, office, working_hours, role) {
+    const hashed_password = hash_password(password)
+    const [user_id] = await db('users').insert({
+        email: email.toLowerCase(),
+        hashed_password: hashed_password,
+        phone_number: phone_number,
+        department: department,
+        office: office,
+        working_hours: working_hours,
+        role: role,
+        is_active: true,
+        is_admin: false
+    }).returning('id')
+
+    return new User(user_id, email.toLowerCase(), password, phone_number, full_name,
+        department, organization_level, office, working_hours, role, true, false)
+}
+
+async function create_admin(email, password, phone_number, full_name, department, organization_level, office, working_hours) {
+    const hashed_password = hash_password(password)
+    const [user_id] = await db('users').insert({
+        email: email.toLowerCase(),
+        hashed_password: hashed_password,
+        phone_number: phone_number,
+        department: department,
+        office: office,
+        working_hours: working_hours,
+        role: 'admin',
+        is_active: true
+    }).returning('id')
+
+    const user = new User(user_id, email.toLowerCase(), password, phone_number, full_name,
+        department, organization_level, office, working_hours, 'admin', true, false)
     set_admin(user)
     return user
 }
 
 function get_user_by_email(email) {
-    return all_users_by_mail[email]
+    return null //todo
 }
 
 function get_user_by_id(id) {
-    return all_users_by_id[id]
+    return null //todo
 }
 
 
@@ -61,30 +75,30 @@ function can_login(user) {
     return false
 }
 
-function disable_user(user_id) { //todo what do we do if the user was the admin!?
+function disable_user(user_id) {
     const user = get_user_by_id(user_id)
     if (user)
-        user.is_active = false
+        user.is_active = false //todo
 }
 
 function enable_user(user_id) {
     const user = get_user_by_id(user_id)
-    if (user) user.is_active = true
+    if (user) user.is_active = true //todo
 }
 
 function login_user(user) {
     if (can_login(user)) {
-        online_users.push(user.id)
+        // online_users.push(user.id) todo
         user.is_logged_in = true
     }
 }
 
 function logout_user(mail) {
     const user = get_user_by_email(mail)
-    const index = online_users.indexOf(user.id)
-    if (index === -1) return -1
-    online_users.splice(index)
-    user.is_logged_in = false
+    // const index = online_users.indexOf(user.id)
+    // if (index === -1) return -1
+    // online_users.splice(index)
+    // user.is_logged_in = false todo
     return 0
 }
 
@@ -101,7 +115,8 @@ function is_password_strong(given_password) {
 }
 
 function get_employee_list() {
-    return employee_list
+    // return employee_list
+    return null //todo
 }
 
 function get_attributes(user_id) {
@@ -124,7 +139,7 @@ function edit_administrative_attributes(user_id, attributes) {
     const user = get_user_by_id(user_id)
     if (user) {
         user.edit(attributes.full_name, attributes.department, attributes.organization_level,
-            attributes.office, attributes.working_hours, attributes.role, attributes.is_active)
+            attributes.office, attributes.working_hours, attributes.role, attributes.is_active) //todo
         return true
     }
     return false
@@ -132,29 +147,29 @@ function edit_administrative_attributes(user_id, attributes) {
 
 function filter_by_department(department_name, current_search_space) {
     const new_space = {}
-    if (!current_search_space) {
-        current_search_space = {...all_users_by_id}
-    }
-    if (!department_name) return current_search_space
-    for (const user_id in current_search_space) {
-        const user = current_search_space[user_id]
-        if (user.department === department_name)
-            new_space[user_id] = user
-    }
+    // if (!current_search_space) {
+    //     current_search_space = {...all_users_by_id}
+    // }
+    // if (!department_name) return current_search_space
+    // for (const user_id in current_search_space) {
+    //     const user = current_search_space[user_id]
+    //     if (user.department === department_name)
+    //         new_space[user_id] = user
+    // } todo
     return new_space
 }
 
 function filter_by_office(office_name, current_search_space) {
     const new_space = {}
-    if (!current_search_space) {
-        current_search_space = {...all_users_by_id}
-    }
-    if (!office_name) return current_search_space
-    for (const user_id in current_search_space) {
-        const user = current_search_space[user_id]
-        if (user.office === office_name)
-            new_space[user_id] = user
-    }
+    // if (!current_search_space) {
+    //     current_search_space = {...all_users_by_id}
+    // }
+    // if (!office_name) return current_search_space
+    // for (const user_id in current_search_space) {
+    //     const user = current_search_space[user_id]
+    //     if (user.office === office_name)
+    //         new_space[user_id] = user
+    // } todo
     return new_space
 }
 
@@ -171,27 +186,36 @@ function get_working_hour(user_id) {
 
 function change_working_hours(email, new_working_hours) {
     const user = get_user_by_email(email)
-    user.change_working_hours(new_working_hours)
+    user.change_working_hours(new_working_hours) //todo
 }
 
 
 function change_full_name(email, new_full_name) {
     const user = get_user_by_email(email)
-    user.change_name(new_full_name)
+    user.change_name(new_full_name)//todo
 }
 
 function delete_user(email) {
     const user = get_user_by_email(email)
     if (user) {
-        all_users_by_mail.delete(email)
-        all_users_by_id.delete(user.id)
+        // all_users_by_mail.delete(email)
+        // all_users_by_id.delete(user.id)
 
-        const index = online_users.indexOf(user.id)
-        if (index !== -1)
-            online_users.splice(index)
-    }
+        // const index = online_users.indexOf(user.id)
+        // if (index !== -1)
+        // online_users.splice(index)
+    } //todo
 }
 
+
+async function is_password_correct(user, given_password) {
+    try {
+        return await bcrypt.compare(given_password, user.hashed_password)
+    } catch (error) {
+        console.log(error)
+    }
+
+}
 
 module.exports = {
     create_admin,
@@ -212,5 +236,6 @@ module.exports = {
     get_admin_mail,
     change_full_name,
     change_working_hours,
-    delete_user
+    delete_user,
+    is_password_correct
 }

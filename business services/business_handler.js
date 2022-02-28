@@ -1,6 +1,6 @@
 const access_manager = require("./access_manager")
-const Action = require("../model/actions")
-const Response = require("../model/response")
+const Action = require("../models/actions")
+const Response = require("../models/response")
 const user_manager = require("../data access/user manager")
 
 //todo status codes can be enum
@@ -12,14 +12,14 @@ const bad_request_status = 400
 const redirect_status = 302 //not sure if it's correct
 
 
-function sign_up_admin(email, password, phone_number, full_name, department, organization_level, office, working_hours) {
+async function sign_up_admin(email, password, phone_number, full_name, department, organization_level, office, working_hours) {
     const response_obj = Response.get_empty_response()
 
     if (user_manager.has_admin()) {
         response_obj.edit(invalid_request_status, 'An admin already exists!')
     } else {
         if (user_manager.can_create_user(email, password)) {
-            user_manager.create_admin(email, password, phone_number, full_name, department, organization_level, office, working_hours)
+            await user_manager.create_admin(email, password, phone_number, full_name, department, organization_level, office, working_hours)
             response_obj.edit(success_status, 'Admin user is created successfully!')
         } else response_obj.edit(invalid_request_status, 'Sign up is invalid!')
     }
@@ -31,7 +31,7 @@ async function sign_up_employee(actor_mail, email, password, phone_number, full_
 
     if (access_manager.has_access(actor_mail, Action.create_employee)) {
         if (user_manager.can_create_user(email, password)) {
-            user_manager.create_employee(email, password, phone_number, full_name, department, organization_level, office, working_hours, role)
+            await user_manager.create_employee(email, password, phone_number, full_name, department, organization_level, office, working_hours, role)
             response_obj.edit(success_status, 'Employee is created successfully!')
         } else {
             response_obj.edit(invalid_request_status, 'Sign up is invalid. Either password is weak or the email is repeated')
@@ -48,7 +48,7 @@ async function login(given_email, given_password) {
     given_email = given_email.toLowerCase()
     const user = user_manager.get_user_by_email(given_email)
 
-    if (!user || !(await user.is_password_correct(given_password))) {
+    if (!user || !(await user_manager.is_password_correct(user, given_password))) {
         response_obj.edit(invalid_request_status, 'Email or password is not correct!')
     } else if (!user_manager.can_login(user)) {
         response_obj.edit(invalid_request_status, 'Invalid login!')

@@ -1,11 +1,16 @@
-const Response = require("../model/response")
-const business_handler = require("../business logic/business_handler")
+const Response = require("../models/response")
+const business_handler = require("../business services/business_handler")
 
 
 async function sign_up_admin(data) {
     if (!(data.email && data.password && data.phone_number && data.full_name && data.department && data.organization_level && data.office && data.working_hours))
         return Response.get_bad_request_response('Signup fields are not complete.')
-    else return business_handler.sign_up_admin(data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level, data.office, data.working_hours)
+    else
+        try {
+            return await business_handler.sign_up_admin(data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level, data.office, data.working_hours)
+        } catch (e) {
+            return Response.get_unexpected_condition()
+        }
 }
 
 async function sign_up_employee(actor_mail, data) {
@@ -14,28 +19,45 @@ async function sign_up_employee(actor_mail, data) {
     if (!(data.email && data.password && data.phone_number && data.full_name && data.department && data.organization_level && data.office &&
         data.working_hours && data.role))
         return Response.get_bad_request_response('Signup fields are not complete.')
-    else return business_handler.sign_up_employee(actor_mail, data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level,
-        data.office, data.working_hours, data.role)
+    else
+        try {
+            return await business_handler.sign_up_employee(actor_mail, data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level,
+                data.office, data.working_hours, data.role)
+        } catch (e) {
+            return Response.get_unexpected_condition()
+        }
 }
 
 async function login(data) {
     if (!(data.email && data.password))
         return Response.get_bad_request_response('Email and password are required!')
-    else return await business_handler.login(data.email, data.password)
+    else try {
+        return await business_handler.login(data.email, data.password)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 async function logout(actor_email) {
-    business_handler.logout(actor_email)
+    await business_handler.logout(actor_email)
 }
 
 async function show_employee_list(actor_mail) {
-    return business_handler.show_employee_list(actor_mail)
+    try {
+        return await business_handler.show_employee_list(actor_mail)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 async function view_employee(actor_mail, data) {
     if (!'employee_id' in data)
         return Response.get_bad_request_response('No employee id specified!')
-    return business_handler.view_employee(actor_mail, data.employee_id)
+    try {
+        return await business_handler.view_employee(actor_mail, data.employee_id)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 async function edit_employee(actor_mail, data) {
@@ -43,19 +65,31 @@ async function edit_employee(actor_mail, data) {
         return Response.get_bad_request_response('No "employee_id" specified!')
     if (!'attributes' in data)
         return Response.get_bad_request_response('No "attributes" field specified!')
-    return business_handler.edit_employee(actor_mail, data.employee_id, data.attributes)
+    try {
+        return await business_handler.edit_employee(actor_mail, data.employee_id, data.attributes)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 async function disable_employee(actor_mail, data) {
     if (!'employee_id' in data)
         return Response.get_bad_request_response('No "employee_id" specified!')
-    return business_handler.disable_employee(actor_mail, data.employee_id)
+    try {
+        return await business_handler.disable_employee(actor_mail, data.employee_id)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 async function enable_employee(actor_mail, data) {
     if (!'employee_id' in data)
         return Response.get_bad_request_response('No "employee_id" specified!')
-    return business_handler.enable_employee(actor_mail, data.employee_id)
+    try {
+        return await business_handler.enable_employee(actor_mail, data.employee_id)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 async function edit_profile(actor_mail, data) {
@@ -65,7 +99,11 @@ async function edit_profile(actor_mail, data) {
         return Response.get_bad_request_response('Attribute should be "working_hour" or "full_name"')
     if (!'new_value' in data)
         return Response.get_bad_request_response('No "new_value" specified!')
-    return business_handler.edit_oneself(actor_mail, data.attribute, data.new_value)
+    try {
+        return await business_handler.edit_oneself(actor_mail, data.attribute, data.new_value)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 async function search(actor_mail, data) {
@@ -73,14 +111,22 @@ async function search(actor_mail, data) {
     //     return Response.get_bad_request_response('No "department" specified!')
     // if (!'office' in data)
     //     return Response.get_bad_request_response('No "office" specified!')
-    return business_handler.search_employees(actor_mail, data.department, data.office)
+    try {
+
+        return await business_handler.search_employees(actor_mail, data.department, data.office)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
-function get_working_hour(actor_mail, data) {
+async function get_working_hour(actor_mail, data) {
     if (!'employee_id' in data)
         return Response.get_bad_request_response('No "employee_id" specified!')
-    return business_handler.get_working_hour(actor_mail, data.employee_id)
-
+    try {
+        return await business_handler.get_working_hour(actor_mail, data.employee_id)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 module.exports = {

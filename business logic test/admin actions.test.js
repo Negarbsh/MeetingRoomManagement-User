@@ -1,5 +1,5 @@
 const user_manager = require('../data access/user manager')
-const business_manager = require('../business logic/business_handler')
+const business_manager = require('../business services/business_handler')
 
 
 let admin

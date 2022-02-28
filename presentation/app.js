@@ -1,6 +1,6 @@
 const express = require('express');
 const request_handler = require("../controller/request_handler")
-const Response = require("../model/response")
+const Response = require("../models/response")
 const jwt = require("jsonwebtoken");
 
 const app = express();
