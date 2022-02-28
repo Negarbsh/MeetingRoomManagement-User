@@ -4,6 +4,20 @@ class Response {
         return new Response()
     }
 
+    static get_invalid_token_response() {
+        const response_obj = this.get_empty_response()
+        response_obj.edit(403, 'access denied') //todo response status could be enum
+        return response_obj
+    }
+
+    static get_bad_request_response(message) {
+        const response_obj = this.get_empty_response()
+        if (!message)
+            response_obj.edit(400, 'Invalid request.')
+        else response_obj.edit(400, 'Invalid request. ' + message)
+        return response_obj
+    }
+
     constructor(status_code, message, token) {
         if (!status_code)
             this.status_code = status_code
@@ -18,7 +32,7 @@ class Response {
 
     get_json() {
         if (!this.json)
-            this.generate_json()
+            this.json = this.generate_json()
         return this.json
     }
 
@@ -36,7 +50,7 @@ class Response {
     }
 
     send_response(res) {
-        res.header('Authorization', this.token)
+        res.header('token', this.token)
         res.status(this.status_code).send(this.get_json())
     }
 }
