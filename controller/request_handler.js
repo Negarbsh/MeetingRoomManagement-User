@@ -44,7 +44,7 @@ async function logout(actor_email) {
 
 async function show_employee_list(actor_mail) {
     try {
-        return await business_handler.show_employee_list(actor_mail)
+        return await business_handler.show_employee_list(actor_mail) //todo the employee list that the business layer returns, isn't necessarily in the format that we want to send as a response
     } catch (e) {
         return Response.get_unexpected_condition()
     }
