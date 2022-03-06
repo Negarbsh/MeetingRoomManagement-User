@@ -3,7 +3,7 @@ const User = require('../models/user')
 const bcrypt = require("bcryptjs");
 
 function hash_password(password) {
-    return bcrypt.hashSync(password, 10); //todo hash salt
+    return bcrypt.hashSync(password + process.env.PASSWORD_KEY, 10);
 }
 
 let admin = null
@@ -197,7 +197,7 @@ async function delete_user(email) {
 
 async function is_password_correct(user, given_password) {
     try {
-        return await bcrypt.compare(given_password, user.hashed_password)
+        return await bcrypt.compare(given_password + process.env.PASSWORD_KEY, user.hashed_password)
     } catch (error) {
         console.log(error)
         return false

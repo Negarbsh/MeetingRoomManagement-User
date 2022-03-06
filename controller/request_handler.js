@@ -1,5 +1,5 @@
 const Response = require("../models/response")
-const business_handler = require("../business services/business_handler")
+const business_handler = require("../business service/business_handler")
 
 
 async function sign_up_admin(data) {

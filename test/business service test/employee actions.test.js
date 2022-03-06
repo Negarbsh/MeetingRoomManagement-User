@@ -1,5 +1,5 @@
-const user_manager = require('../data access/user manager')
-const business_handler = require('../business services/business_handler')
+const user_manager = require('../../data access/user manager')
+const business_handler = require('../../business service/business_handler')
 
 let emp1, emp2
 
