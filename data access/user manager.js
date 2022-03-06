@@ -205,7 +205,13 @@ async function is_password_correct(user, given_password) {
 
 }
 
+function is_admin(email) {
+    if (!admin) return false
+    return admin.email === email
+}
+
 module.exports = {
+    is_admin,
     create_admin,
     create_employee,
     get_user_by_id,

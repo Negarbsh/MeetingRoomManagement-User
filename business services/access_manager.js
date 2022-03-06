@@ -21,9 +21,9 @@ async function has_access(actor_mail, action) {
 }
 
 
-function create_access_token(email, id) {
+function create_access_token(email, id, is_admin) {
     return jwt.sign(
-        {user_id: id, email: email},
+        {user_id: id, email: email, is_admin: is_admin},
         process.env.TOKEN_KEY,
         {
             expiresIn: "2h",
