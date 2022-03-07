@@ -205,8 +205,17 @@ async function is_password_correct(user, given_password) {
 
 }
 
-function is_admin(email) {
-    if (!admin) return false
+async function load_admin() {
+    const admins = await User.query().select('*').where('is_admin', '=', 't')
+    set_admin(admins[0])
+}
+
+async function is_admin(email) {
+    if (!admin) {
+        await load_admin()
+        if (!admin)
+            return false
+    }
     return admin.email === email
 }
 

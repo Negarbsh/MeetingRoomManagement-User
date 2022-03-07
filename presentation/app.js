@@ -54,12 +54,27 @@ app.post('/login', async (req, res) => {
 app.post('/logout', async (req, res) => {
     const decoded_token = decode_token(req)
     let response_obj
-    if (!decoded_token)
+    if (!decoded_token) {
         response_obj = Response.get_invalid_token_response()
-    else {
-        response_obj = await request_handler.logout(decoded_token.email)
+        response_obj.send_response(res)
+    } else {
+        request_handler.logout(decoded_token.email)
+            .then(r => {
+                r.send_response(res)
+            })
+            .catch(error => {
+                console.log(error)
+                response_obj = Response.get_unexpected_condition()
+                response_obj.send_response(res)
+            })
     }
-    response_obj.send_response(res)
+    // try {
+    //     response_obj = await request_handler.logout(decoded_token.email)
+    // } catch (e) {
+    //     response_obj = Response.get_unexpected_condition()
+    // }
+    // }
+    // response_obj.send_response(res)
 })
 
 

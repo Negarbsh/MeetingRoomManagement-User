@@ -39,7 +39,11 @@ async function login(data) {
 }
 
 async function logout(actor_email) {
-    await business_handler.logout(actor_email)
+    try {
+        return await business_handler.logout(actor_email)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 async function show_employee_list(actor_mail) {

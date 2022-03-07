@@ -58,8 +58,8 @@ async function login(given_email, given_password) {
     } else if (!await user_manager.can_login(user)) {
         response_obj.edit(invalid_request_status, 'Invalid login!')
     } else {
-        const token = await access_manager.create_access_token(given_email, user.id, user_manager.is_admin(given_email))
         await user_manager.login_user(user)
+        const token = await access_manager.create_access_token(given_email, user.id, await user_manager.is_admin(given_email))
         response_obj.edit(success_status, 'login successful!', token)
     }
     return response_obj

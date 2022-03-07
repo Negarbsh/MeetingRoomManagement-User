@@ -13,6 +13,7 @@ class Response {
     static get_unexpected_condition(){
         const res = this.get_empty_response()
         res.edit(500, 'Oops! Something went wrong :(')
+        return res
     }
 
     static get_bad_request_response(message) {
