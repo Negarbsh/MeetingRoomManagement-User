@@ -17,26 +17,26 @@ function is_password_strong(given_password) {
     return /[0-9]+/.test(given_password) && /[A-Za-z]+/.test(given_password)
 }
 
-async function sign_up_admin(email, password, phone_number, full_name, department, organization_level, office, working_hours) {
+async function sign_up_admin(user) {
     const response_obj = Response.get_empty_response()
 
     if (user_manager.has_admin()) {
         response_obj.edit(invalid_request_status, 'An admin already exists!')
     } else {
-        if (is_password_strong(password) && await user_manager.can_create_user(email)) {
-            await user_manager.create_admin(email, password, phone_number, full_name, department, organization_level, office, working_hours)
+        if (is_password_strong(user.password) && await user_manager.can_create_user(user.email)) {
+            await user_manager.create_admin(user)
             response_obj.edit(success_status, 'Admin user is created successfully!')
         } else response_obj.edit(invalid_request_status, 'Sign up is invalid!')
     }
     return response_obj
 }
 
-async function sign_up_employee(actor_mail, email, password, phone_number, full_name, department, organization_level, office, working_hours, role) {
+async function sign_up_employee(actor_mail, user) {
     const response_obj = Response.get_empty_response()
 
     if (await access_manager.has_access(actor_mail, Action.create_employee)) {
-        if (is_password_strong(password) && await user_manager.can_create_user(email, password)) {
-            await user_manager.create_employee(email, password, phone_number, full_name, department, organization_level, office, working_hours, role)
+        if (is_password_strong(user.password) && await user_manager.can_create_user(user.email, user.password)) {
+            await user_manager.create_employee(user)
             response_obj.edit(success_status, 'Employee is created successfully!')
         } else {
             response_obj.edit(invalid_request_status, 'Sign up is invalid. Either password is weak or the email is repeated')
@@ -171,7 +171,8 @@ async function get_working_hour(actor_mail, employee_id) {
     const response_obj = Response.get_empty_response()
     if (await access_manager.has_access(actor_mail, Action.get_working_hour)) {
         const answer = await user_manager.get_working_hour(employee_id)
-        if (answer === null) response_obj.edit(bad_request_status, 'No user with this id exists!')
+        if (answer === null)
+            response_obj.edit(bad_request_status, 'No user with this id exists!')
         else response_obj.edit(success_status, answer)
     } else response_obj.edit(access_denied_status, 'Invalid access.')
     return response_obj

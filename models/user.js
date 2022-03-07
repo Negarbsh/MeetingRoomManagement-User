@@ -1,37 +1,17 @@
-const { Model } = require('objection')
-
-const db = require('../db/db_setup')
-
-Model.knex(db)
-
-class User extends Model {
-    static get tableName() {
-        return 'app_users'
+class User {
+    constructor(email, password, phone_number, full_name, department, organization, office, working_hours, role) {
+        this.email = email.toLowerCase()
+        this.password = password
+        this.phone_number = phone_number
+        this.full_name = full_name
+        this.department = department
+        this.organization_level = organization
+        this.office = office
+        this.working_hours = working_hours
+        this.role = role
     }
 
-    static get idColumn() {
-        return 'id';
-    }
 
-    static get joinSchema() {
-        return {
-            type: 'object',
-            properties: {
-                id: {type: 'integer'},
-                email: {type: 'string'},
-                phone_number: {type: 'string'},
-                full_name: {type: 'string'},
-                department: {type: 'string'},
-                organization_level: {type: 'string'},
-                role: {type: 'string'},
-                is_active: {type: 'boolean'},
-                is_admin: {type: 'boolean'},
-                hashed_password: {type: 'string'},
-                office: {type: 'string'},
-                working_hours: {type: 'string'},
-            }
-        }
-    }
 }
 
 module.exports = User

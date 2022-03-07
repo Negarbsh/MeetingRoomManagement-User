@@ -1,5 +1,6 @@
 const user_manager = require('../../data access/user manager')
 const business_handler = require('../../business service/business_handler')
+const User = require("../../models/user");
 
 let emp1, emp2
 
@@ -7,11 +8,11 @@ beforeAll(async () => {
     emp1 = await user_manager.get_user_by_email('emp1')
     emp2 = await user_manager.get_user_by_email('emp2')
     if (!emp1)
-        emp1 = await user_manager.create_employee('emp1', 'emp1 password', 1234,
-            'emp1 user', 'a department', 'an organization', 'emp1 and emp2 office', 9, 'employee')
+        emp1 = await user_manager.create_employee(new User('emp1', 'emp1 password', 1234,
+            'emp1 user', 'a department', 'an organization', 'emp1 and emp2 office', 9, 'employee'))
     if (!emp2)
-        emp2 = await user_manager.create_employee('emp2', 'emp2 password', 1234,
-            'emp2 user', 'a department', 'an organization', 'emp1 and emp2 office', 10, 'employee')
+        emp2 = await user_manager.create_employee(new User('emp2', 'emp2 password', 1234,
+            'emp2 user', 'a department', 'an organization', 'emp1 and emp2 office', 10, 'employee'))
 })
 
 beforeEach(async () => {
@@ -88,8 +89,8 @@ test('edit invalid field of profile', async () => {
 
 
 test('get all employees from a department', async () => {
-    const emp3 = await user_manager.create_employee('emp3', 'emp3 password', 1234,
-        'emp1 user', 'another department', 'an organization', 'the office', 9, 'employee')
+    const emp3 = await user_manager.create_employee(new User('emp3', 'emp3 password', 1234,
+        'emp1 user', 'another department', 'an organization', 'the office', 9, 'employee'))
 
     await business_handler.login('emp1', 'emp1 password')
     const response = await business_handler.search_employees('emp1', 'a department', null)
@@ -102,8 +103,8 @@ test('get all employees from a department', async () => {
 })
 
 test('get all employees from an office', async () => {
-    const emp4 = await user_manager.create_employee('emp4', 'emp4 password', 1234,
-        'emp1 user', 'a department', 'an organization', 'another office', 9, 'employee')
+    const emp4 = await user_manager.create_employee(new User('emp4', 'emp4 password', 1234,
+        'emp1 user', 'a department', 'an organization', 'another office', 9, 'employee'))
 
     const response = await business_handler.search_employees('emp1', null, 'emp1 and emp2 office')
     const search_result = response.message

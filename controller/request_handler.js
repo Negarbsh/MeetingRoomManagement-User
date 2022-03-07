@@ -1,13 +1,14 @@
 const Response = require("../models/response")
 const business_handler = require("../business service/business_handler")
-
+const User = require('../models/user')
 
 async function sign_up_admin(data) {
     if (!(data.email && data.password && data.phone_number && data.full_name && data.department && data.organization_level && data.office && data.working_hours))
         return Response.get_bad_request_response('Signup fields are not complete.')
     else
         try {
-            return await business_handler.sign_up_admin(data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level, data.office, data.working_hours)
+            const user = new User(data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level, data.office, data.working_hours, 'admin') //todo role should be enum
+            return await business_handler.sign_up_admin(user)
         } catch (e) {
             return Response.get_unexpected_condition()
         }
@@ -21,8 +22,8 @@ async function sign_up_employee(actor_mail, data) {
         return Response.get_bad_request_response('Signup fields are not complete.')
     else
         try {
-            return await business_handler.sign_up_employee(actor_mail, data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level,
-                data.office, data.working_hours, data.role)
+            const user = new User(data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level, data.office, data.working_hours, data.role)
+            return await business_handler.sign_up_employee(actor_mail, user)
         } catch (e) {
             return Response.get_unexpected_condition()
         }
@@ -111,10 +112,6 @@ async function edit_profile(actor_mail, data) {
 }
 
 async function search(actor_mail, data) {
-    // if (!'department' in data)
-    //     return Response.get_bad_request_response('No "department" specified!')
-    // if (!'office' in data)
-    //     return Response.get_bad_request_response('No "office" specified!')
     try {
 
         return await business_handler.search_employees(actor_mail, data.department, data.office)
