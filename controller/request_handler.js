@@ -6,6 +6,7 @@ const {office, get_office} = require('../models/enums/office')
 const {OrganizationLevel, get_organization_level} = require("../models/enums/organization_level");
 const {get_department} = require("../models/enums/department");
 const TimeFormat = require("hh-mm-ss");
+const {Role, get_role} = require("../models/enums/role");
 
 
 function get_working_hours(input_data) {
@@ -36,7 +37,7 @@ function create_user_model(input_data, role) {
 async function sign_up_admin(data) {
     if (!(data.email && data.password && data.phone_number && data.full_name && data.department && data.organization_level && data.office && data.working_hours))
         return Response.get_bad_request_response('Signup fields are not complete.')
-    const user = create_user_model(data, 'admin'); //todo role should be enum
+    const user = create_user_model(data, get_role('admin'));
     if (!user) return Response.get_bad_request_response('Signup fields are of invalid format.')
     try {
         return await business_handler.sign_up_admin(user)
@@ -52,7 +53,7 @@ async function sign_up_employee(actor_mail, data) {
         data.working_hours && data.role))
         return Response.get_bad_request_response('Signup fields are not complete.')
 
-    const user = create_user_model(data, data.role)
+    const user = create_user_model(data, get_role(data.role))
     if (!user) return Response.get_bad_request_response('Signup fields are of invalid format.')
     try {
         return await business_handler.sign_up_employee(actor_mail, user)
@@ -145,7 +146,6 @@ async function edit_profile(actor_mail, data) {
 
 async function search(actor_mail, data) {
     try {
-
         return await business_handler.search_employees(actor_mail, data.department, data.office)
     } catch (e) {
         return Response.get_unexpected_condition()
@@ -156,7 +156,11 @@ async function get_working_hour(actor_mail, data) {
     if (!'employee_id' in data)
         return Response.get_bad_request_response('No "employee_id" specified!')
     try {
-        return await business_handler.get_working_hour(actor_mail, data.employee_id)
+        const working_hour = await business_handler.get_working_hour(actor_mail, data.employee_id)
+        return {
+            start_time: working_hour.get_time_display(true),
+            end_time: working_hour.get_time_display(false)
+        }
     } catch (e) {
         return Response.get_unexpected_condition()
     }

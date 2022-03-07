@@ -14,7 +14,7 @@ class WorkingHour {
 
         try {
             // guide : TimeFormat.fromS(150, 'hh:mm:ss')  is '00:02:30'
-            return TimeFormat.fromS(displaying_time, 'hh:mm:ss')      // '00:02:30'
+            return TimeFormat.fromS(displaying_time, 'hh:mm:ss')
         } catch (e) {
             return null
         }
