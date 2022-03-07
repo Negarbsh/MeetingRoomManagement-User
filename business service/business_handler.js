@@ -1,5 +1,5 @@
 const access_manager = require("./access_manager")
-const Action = require("../models/actions")
+const Action = require("../models/enums/actions")
 const Response = require("../models/response")
 const user_manager = require("../data access/user manager")
 
@@ -59,7 +59,7 @@ async function login(given_email, given_password) {
         response_obj.edit(invalid_request_status, 'Invalid login!')
     } else {
         await user_manager.login_user(user)
-        const token = await access_manager.create_access_token(given_email, user.id, await user_manager.is_admin(given_email))
+        const token = await access_manager.create_access_token(given_email, user.$id, await user_manager.is_admin(given_email))
         response_obj.edit(success_status, 'login successful!', token)
     }
     return response_obj

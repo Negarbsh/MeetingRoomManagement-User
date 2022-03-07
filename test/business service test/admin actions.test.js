@@ -1,13 +1,14 @@
 const user_manager = require('../../data access/user manager')
 const business_manager = require('../../business service/business_handler')
+const User = require("../../models/user");
 
 
 let admin
 
 beforeAll(async () => {
     await user_manager.delete_user('admin email')
-    admin = await user_manager.create_admin('admin email', 'admin password1', 1234,
-        'admin user', 'a department', 'an organization', 'admin office', 9, 'admin')
+    admin = await user_manager.create_admin(new User('admin email', 'admin password1', 1234,
+        'admin user', 'a department', 'an organization', 'admin office', 9, 'admin'))
     await business_manager.logout(admin)
 })
 

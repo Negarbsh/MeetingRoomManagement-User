@@ -1,17 +1,48 @@
 const Response = require("../models/response")
 const business_handler = require("../business service/business_handler")
 const User = require('../models/user')
+const WorkingHour = require('../models/workingHour')
+const {office, get_office} = require('../models/enums/office')
+const {OrganizationLevel, get_organization_level} = require("../models/enums/organization_level");
+const {get_department} = require("../models/enums/department");
+const TimeFormat = require("hh-mm-ss");
+
+
+function get_working_hours(input_data) {
+    let start_time, end_time
+    try {
+        // guide: TimeFormat.toS('137:00:00) is 493200
+        start_time = TimeFormat.toS(input_data.working_hours.start_time)
+        end_time = TimeFormat.toS(input_data.working_hours.end_time)
+    } catch (e) {
+        return null
+    }
+    return new WorkingHour(start_time, end_time)
+}
+
+function create_user_model(input_data, role) {
+    if (!input_data.working_hours.start_time || !input_data.working_hours.end_time)
+        return null
+    const working_hours = get_working_hours(input_data)
+    const office = get_office(input_data.office)
+    const organization_level = get_organization_level(input_data.organization_level)
+    const dep = get_department(input_data.department)
+
+    if (!working_hours || !organization_level || !office || !dep) return null
+    return new User(input_data.email, input_data.password, input_data.phone_number, input_data.full_name,
+        dep, organization_level, office, working_hours, role);
+}
 
 async function sign_up_admin(data) {
     if (!(data.email && data.password && data.phone_number && data.full_name && data.department && data.organization_level && data.office && data.working_hours))
         return Response.get_bad_request_response('Signup fields are not complete.')
-    else
-        try {
-            const user = new User(data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level, data.office, data.working_hours, 'admin') //todo role should be enum
-            return await business_handler.sign_up_admin(user)
-        } catch (e) {
-            return Response.get_unexpected_condition()
-        }
+    const user = create_user_model(data, 'admin'); //todo role should be enum
+    if (!user) return Response.get_bad_request_response('Signup fields are of invalid format.')
+    try {
+        return await business_handler.sign_up_admin(user)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 async function sign_up_employee(actor_mail, data) {
@@ -20,13 +51,14 @@ async function sign_up_employee(actor_mail, data) {
     if (!(data.email && data.password && data.phone_number && data.full_name && data.department && data.organization_level && data.office &&
         data.working_hours && data.role))
         return Response.get_bad_request_response('Signup fields are not complete.')
-    else
-        try {
-            const user = new User(data.email, data.password, data.phone_number, data.full_name, data.department, data.organization_level, data.office, data.working_hours, data.role)
-            return await business_handler.sign_up_employee(actor_mail, user)
-        } catch (e) {
-            return Response.get_unexpected_condition()
-        }
+
+    const user = create_user_model(data, data.role)
+    if (!user) return Response.get_bad_request_response('Signup fields are of invalid format.')
+    try {
+        return await business_handler.sign_up_employee(actor_mail, user)
+    } catch (e) {
+        return Response.get_unexpected_condition()
+    }
 }
 
 async function login(data) {

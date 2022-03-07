@@ -1,4 +1,4 @@
-const Action = require('../models/actions');
+const Action = require('../models/enums/actions');
 const user_manager = require('../data access/user manager')
 const jwt = require("jsonwebtoken");
 
