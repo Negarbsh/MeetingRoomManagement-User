@@ -1,4 +1,4 @@
-const user_manager = require('../../data access/user manager')
+const user_manager = require('../../data_access/user_manager')
 const business_handler = require('../../business service/business_handler')
 
 test('signup admin with invalid password, unsuccessful', async () => {

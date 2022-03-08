@@ -1,7 +1,7 @@
 const access_manager = require("./access_manager")
 const Action = require("../models/enums/actions")
 const Response = require("../models/response")
-const user_manager = require("../data access/user manager")
+const user_manager = require("../data_access/user_manager")
 
 //todo status codes can be enum
 const success_status = 200
