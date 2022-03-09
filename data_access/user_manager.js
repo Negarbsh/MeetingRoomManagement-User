@@ -6,10 +6,15 @@ function hash_password(password) {
     return bcrypt.hashSync(password + process.env.PASSWORD_KEY, 10);
 }
 
-class user_manager_class {
-     static async create_employee(user) {
+class user_manager {
+
+    static is_mocked() {
+        return false;
+    }
+
+    static async create_employee(user) {
         if (!user) return null
-        const existing_user = await user_manager_class.get_user_by_email(user.email)
+        const existing_user = await user_manager.get_user_by_email(user.email)
         if (existing_user) return existing_user
 
         const hashed_password = hash_password(user.password)
@@ -32,7 +37,7 @@ class user_manager_class {
 
     static async create_admin(user) {
         if (!user) return null
-        if (await user_manager_class.get_user_by_email(user.email)) return null
+        if (await user_manager.get_user_by_email(user.email)) return null
 
         const hashed_password = hash_password(user.password)
         const userObject = await objectionUser.query().insert({
@@ -49,7 +54,7 @@ class user_manager_class {
             is_admin: true,
             is_logged_in: false
         });
-        user_manager_class.set_admin(user)
+        user_manager.set_admin(user)
         return userObject
     }
 
@@ -65,16 +70,18 @@ class user_manager_class {
 
 
     static has_admin() {
-        return user_manager_class.admin !== null
+        return user_manager.admin !== null
     }
 
     static set_admin(new_admin) {
-        user_manager_class.admin = new_admin
+        user_manager.admin = new_admin
     }
 
-    static get_admin_mail() {
-        if (user_manager_class.admin !== null)
-            return user_manager_class.admin.email
+    static async get_admin_mail() {
+        if (user_manager.admin === null)
+            await user_manager.load_admin()
+        if (user_manager.admin !== null)
+            return user_manager.admin.email
         return null
     }
 
@@ -101,7 +108,7 @@ class user_manager_class {
     }
 
     static async login_user(user) {
-        if (user_manager_class.can_login(user)) {
+        if (user_manager.can_login(user)) {
             user.is_logged_in = true
             await objectionUser.query()
                 .findById(user.id)
@@ -112,10 +119,10 @@ class user_manager_class {
     }
 
     static async logout_user(mail) {
-        const user = await user_manager_class.get_user_by_email(mail)
+        const user = await user_manager.get_user_by_email(mail)
         if (!user) return -1
         await objectionUser.query()
-            .findById(user.$id)
+            .findById(user.id)
             .patch({
                 is_logged_in: false
             });
@@ -123,7 +130,7 @@ class user_manager_class {
     }
 
     static async can_create_user(email) {
-        const user = await user_manager_class.get_user_by_email(email)
+        const user = await user_manager.get_user_by_email(email)
         return !user;
     }
 
@@ -170,7 +177,7 @@ class user_manager_class {
 
 
     static async change_working_hours(email, new_working_hours) {
-        const user = await user_manager_class.get_user_by_email(email)
+        const user = await user_manager.get_user_by_email(email)
         const id = user.$id()
         await objectionUser.query()
             .findById(id)
@@ -181,7 +188,7 @@ class user_manager_class {
 
 
     static async change_full_name(email, new_full_name) {
-        const user = await user_manager_class.get_user_by_email(email)
+        const user = await user_manager.get_user_by_email(email)
         const id = user.$id() //what is it?
         await objectionUser.query()
             .findById(id)
@@ -191,7 +198,7 @@ class user_manager_class {
     }
 
     static async delete_user(email) {
-        const user = await user_manager_class.get_user_by_email(email)
+        const user = await user_manager.get_user_by_email(email)
         if (user)
             await objectionUser.query().deleteById(user.$id());
     }
@@ -210,20 +217,20 @@ class user_manager_class {
 
     static async load_admin() {
         const admins = await objectionUser.query().select('*').where('is_admin', '=', 't')
-        user_manager_class.set_admin(admins[0])
+        user_manager.set_admin(admins[0])
     }
 
     static async is_admin(email) {
-        if (!user_manager_class.admin) {
-            await user_manager_class.load_admin()
-            if (!user_manager_class.admin)
+        if (!user_manager.admin) {
+            await user_manager.load_admin()
+            if (!user_manager.admin)
                 return false
         }
-        return user_manager_class.admin.email === email
+        return user_manager.admin.email === email
     }
 
 }
 
-user_manager_class.admin = null
+user_manager.admin = null
 
-module.exports = user_manager_class
+module.exports = user_manager

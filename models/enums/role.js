@@ -10,7 +10,7 @@ function get_role(role_str) {
         if (key === role_str.toUpperCase())
             return key
     }
-    return null
+    return Role.OTHER
 }
 
 module.exports = {Role, get_role}

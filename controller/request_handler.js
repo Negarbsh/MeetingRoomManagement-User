@@ -42,6 +42,7 @@ async function sign_up_admin(data) {
     try {
         return await business_handler.sign_up_admin(user)
     } catch (e) {
+        console.log(e)
         return Response.get_unexpected_condition()
     }
 }
@@ -58,6 +59,7 @@ async function sign_up_employee(actor_mail, data) {
     try {
         return await business_handler.sign_up_employee(actor_mail, user)
     } catch (e) {
+        console.log(e)
         return Response.get_unexpected_condition()
     }
 }
@@ -68,6 +70,7 @@ async function login(data) {
     else try {
         return await business_handler.login(data.email, data.password)
     } catch (e) {
+        console.log(e)
         return Response.get_unexpected_condition()
     }
 }
@@ -76,6 +79,7 @@ async function logout(actor_email) {
     try {
         return await business_handler.logout(actor_email)
     } catch (e) {
+        console.log(e)
         return Response.get_unexpected_condition()
     }
 }

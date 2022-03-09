@@ -12,7 +12,7 @@ async function has_access(actor_mail, action) {
     switch (action) {
         case Action.create_employee || Action.view_employee || Action.edit_employee || Action.show_employee_list
         || Action.logout || Action.disable_employee || Action.enable_employee:
-            return actor_mail === user_manager.get_admin_mail() && user.is_logged_in
+            return await user_manager.is_admin(actor_mail) && user.is_logged_in
         case Action.edit_oneself || Action.search_employees || Action.get_working_hour:
             return user.is_logged_in
         default:

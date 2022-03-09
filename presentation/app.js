@@ -156,14 +156,14 @@ app.post('/edit_profile', async (req, res) => {
 })
 
 
-app.post('/search', (req, res) => {
+app.post('/search', async (req, res) => {
     const decoded_token = decode_token(req)
     let response_obj
     if (!decoded_token)
         response_obj = Response.get_invalid_token_response()
     else {
         const data = req.body
-        response_obj = request_handler.search(decoded_token.email, data)
+        response_obj = await request_handler.search(decoded_token.email, data)
     }
     response_obj.send_response(res)
 })

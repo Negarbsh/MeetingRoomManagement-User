@@ -1,5 +1,9 @@
 class user_manager {
 
+    static is_mocked() {
+        return true;
+    }
+
     static async create_employee(user) {
         if (!user) return null
         const existing_user = await user_manager.get_user_by_email(user.email)
@@ -30,7 +34,7 @@ class user_manager {
         user.id = last_id++
         all_users_by_mail[user.email] = user
         all_users_by_id[user.id] = user
-        set_admin(user)
+        user_manager.set_admin(user)
         return user
     }
 
@@ -131,7 +135,7 @@ class user_manager {
         if (!current_search_space) {
             current_search_space = {...all_users_by_id}
         }
-        if (!department_name) return current_search_space
+        if (department_name === null) return current_search_space
         for (const user_id in current_search_space) {
             const user = current_search_space[user_id]
             if (user.department === department_name)
@@ -145,7 +149,7 @@ class user_manager {
         if (!current_search_space) {
             current_search_space = {...all_users_by_id}
         }
-        if (!office_name) return current_search_space
+        if (office_name === null) return current_search_space
         for (const user_id in current_search_space) {
             const user = current_search_space[user_id]
             if (user.office === office_name)
@@ -160,7 +164,7 @@ class user_manager {
 
 
     static async get_working_hour(user_id) {
-        const user = user_manager.get_user_by_id(user_id)
+        const user = await user_manager.get_user_by_id(user_id)
         if (!user) return null
         return user.working_hours
     }
@@ -208,4 +212,6 @@ const all_users_by_id = {}
 const employee_list = []
 let last_id = 0
 
-module.exports = user_manager
+
+um = user_manager
+module.exports = um
